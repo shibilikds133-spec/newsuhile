@@ -1,0 +1,119 @@
+/* index.css — CSS Variables & Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #16a34a;        /* green-600 — main brand */
+    --color-primary-dark: #14532d;   /* green-900 — sidebar background */
+    --color-primary-light: #f0fdf4;  /* green-50 — light backgrounds */
+    --color-primary-mid: #166534;    /* green-800 — sidebar active */
+    --color-navy: #1e3a5f;           /* voucher accent */
+    --color-danger: #dc2626;         /* red-600 — expense, delete */
+    --color-warning: #d97706;        /* amber-600 — unpaid, refreshment */
+    --color-info: #2563eb;           /* blue-600 — neutral accent */
+    --color-surface: #ffffff;
+    --color-bg: #f8fafc;
+    --color-border: #e2e8f0;
+    --color-text: #1e293b;
+    --color-muted: #64748b;
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .h-safe-area-bottom {
+    height: var(--safe-area-inset-bottom);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .sidebar, 
+  .topbar, 
+  .no-print, 
+  button, 
+  .filter-bar, 
+  .export-buttons,
+  .toaster-container,
+  .no-print-area {
+    display: none !important;
+  }
+
+  .md\:ml-60 {
+    margin-left: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body, html {
+    background: white !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .print-content {
+    display: block !important;
+    width: 100% !important;
+    position: static !important;
+  }
+
+  .bg-white {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Specifically for the Smart Print Preview Modal */
+  body {
+    visibility: hidden !important;
+  }
+  
+  .print-content, .print-content * {
+    visibility: visible !important;
+  }
+  
+  .print-content {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide the modal overlay during print if it's there */
+  .fixed.inset-0.z-50 {
+    visibility: visible !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  /* Extra assurance to hide main ui */
+  .sidebar, .topbar, .no-print, .filter-bar, .exclude-from-print {
+    display: none !important;
+  }
+}
+.receipt-landscape { width: 842px; min-height: 380px; background-image: radial-gradient(#f1f5f9 1px, transparent 1px); background-size: 20px 20px; display: flex; flex-direction: column; } @media (max-width: 880px) { .receipt-landscape { transform: scale(0.8); transform-origin: center top; } .print-container { height: 420px; } } @media (max-width: 640px) { .receipt-landscape { transform: scale(0.5); transform-origin: center top; } .print-container { height: 280px; } } 
+
+/* Receipt container */
+.receipt-wrapper {
+  min-width: 750px;        /* ✅ Fixed minimum width */
+  width: 750px;
+  overflow-x: visible;
+}
+
+/* Parent scroll container */
+.receipt-scroll-container {
+  overflow-x: auto;        /* ✅ Mobile-ൽ scroll ചെയ്യാം */
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}

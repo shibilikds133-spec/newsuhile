@@ -1,0 +1,56 @@
+{
+  "preview": {
+    "file": "receipt-preview-chromium.png",
+    "width": 842,
+    "height": 397,
+    "scale": 1,
+    "count": 7213,
+    "rawBounds": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    },
+    "cssBounds": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    }
+  },
+  "exported": {
+    "file": "receipt-export-html2canvas.png",
+    "width": 1684,
+    "height": 794,
+    "scale": 2,
+    "count": 29584,
+    "rawBounds": {
+      "left": 146,
+      "top": 524,
+      "right": 586,
+      "bottom": 706,
+      "width": 440,
+      "height": 182
+    },
+    "cssBounds": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    }
+  },
+  "diff": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0,
+    "width": 0,
+    "height": 0
+  }
+}

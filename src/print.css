@@ -1,0 +1,31 @@
+@media print {
+  .sidebar,
+  .topbar,
+  .filter-bar,
+  .export-buttons,
+  .btn-delete,
+  .btn-export,
+  .pagination,
+  .mobile-drawer,
+  nav {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12px;
+    background: white;
+  }
+
+  .receipt-card,
+  .voucher-card {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    break-inside: avoid;
+  }
+
+  .print-content {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}

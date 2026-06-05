@@ -1,0 +1,26 @@
+appId: com.dawatrust.desktop
+productName: Dawa Trust
+directories:
+  output: dist_electron
+  buildResources: public
+files:
+  - dist/**/*
+  - main.cjs
+  - preload.cjs
+  - package.json
+  - public/**/*
+  - "!node_modules/**/*"
+win:
+  target: nsis
+  icon: public/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Dawa Trust
+  installerIcon: public/icon.ico
+  uninstallerIcon: public/icon.ico
+  deleteAppDataOnUninstall: false # Keep backups safe!
+extraMetadata:
+  main: main.cjs

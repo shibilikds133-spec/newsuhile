@@ -1,0 +1,44 @@
+{
+  "styleName": "consolas",
+  "meta": {
+    "row": {
+      "left": 75,
+      "top": 319,
+      "right": 291,
+      "bottom": 379
+    },
+    "union": {
+      "left": 111.140625,
+      "top": 331,
+      "right": 254.84375,
+      "bottom": 367
+    }
+  },
+  "preview": {
+    "left": 131,
+    "top": 338,
+    "right": 251,
+    "bottom": 364,
+    "width": 120,
+    "height": 26,
+    "count": 730
+  },
+  "png": {
+    "left": 131,
+    "top": 353.5,
+    "right": 252,
+    "bottom": 375,
+    "width": 121,
+    "height": 21.5,
+    "count": 3467
+  },
+  "diff": {
+    "top": 15.5,
+    "bottom": 11,
+    "height": -4.5,
+    "previewTopGap": 19,
+    "previewBottomGap": 15,
+    "pngTopGap": 34.5,
+    "pngBottomGap": 4
+  }
+}

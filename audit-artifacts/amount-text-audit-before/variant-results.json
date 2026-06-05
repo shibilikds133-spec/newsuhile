@@ -1,0 +1,170 @@
+[
+  {
+    "name": "baseline-current",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 339
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 321,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 30,
+      "count": 3934
+    },
+    "glyphTopGap": 30,
+    "glyphBottomGap": 0
+  },
+  {
+    "name": "value-row-leading-none",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 339
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 321,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 30,
+      "count": 3934
+    },
+    "glyphTopGap": 30,
+    "glyphBottomGap": 0
+  },
+  {
+    "name": "spans-leading-none",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 345
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 333
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 318,
+      "right": 291,
+      "bottom": 345,
+      "width": 216,
+      "height": 27,
+      "count": 3888
+    },
+    "glyphTopGap": 27,
+    "glyphBottomGap": 0
+  },
+  {
+    "name": "row-and-spans-leading-none",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 345
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 333
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 318,
+      "right": 291,
+      "bottom": 345,
+      "width": 216,
+      "height": 27,
+      "count": 3888
+    },
+    "glyphTopGap": 27,
+    "glyphBottomGap": 0
+  },
+  {
+    "name": "inline-flex-spans",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 339
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 321,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 30,
+      "count": 3934
+    },
+    "glyphTopGap": 30,
+    "glyphBottomGap": 0
+  },
+  {
+    "name": "grid-row",
+    "dom": {
+      "row": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351
+      },
+      "union": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859375,
+        "bottom": 339
+      }
+    },
+    "glyph": {
+      "left": 75,
+      "top": 321,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 30,
+      "count": 3934
+    },
+    "glyphTopGap": 30,
+    "glyphBottomGap": 0
+  }
+]

@@ -1,0 +1,173 @@
+{
+  "diff": {
+    "amountBoxLeftPx": 0,
+    "amountBoxTopPx": 0,
+    "amountBoxRightPx": 0,
+    "receiptWidthPx": 0,
+    "wrapperWidthPx": 0,
+    "canvasWidth": 1684,
+    "canvasHeight": 794
+  },
+  "before": {
+    "phase": "preview-dom",
+    "wrapperRect": {
+      "left": 179,
+      "top": 297.078,
+      "right": 1021,
+      "bottom": 693.922,
+      "width": 842,
+      "height": 396.844
+    },
+    "receiptRect": {
+      "left": 0,
+      "top": 0,
+      "right": 842,
+      "bottom": 396.844,
+      "width": 842,
+      "height": 396.844
+    },
+    "amountBox": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    },
+    "amountHeader": {
+      "left": 75,
+      "top": 264,
+      "right": 291,
+      "bottom": 291,
+      "width": 216,
+      "height": 27
+    },
+    "amountValue": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 60
+    },
+    "inlineStyle": {
+      "width": "",
+      "transform": "none",
+      "position": ""
+    },
+    "computed": {
+      "wrapperWidth": "842px",
+      "receiptWidth": "842px",
+      "footerMarginTop": "48px",
+      "receiptMinHeight": "396.85px"
+    }
+  },
+  "afterMutation": {
+    "phase": "export-dom-before-canvas",
+    "wrapperRect": {
+      "left": 179,
+      "top": 297.078,
+      "right": 1021,
+      "bottom": 693.922,
+      "width": 842,
+      "height": 396.844
+    },
+    "receiptRect": {
+      "left": 0,
+      "top": 0,
+      "right": 842,
+      "bottom": 396.844,
+      "width": 842,
+      "height": 396.844
+    },
+    "amountBox": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    },
+    "amountHeader": {
+      "left": 75,
+      "top": 264,
+      "right": 291,
+      "bottom": 291,
+      "width": 216,
+      "height": 27
+    },
+    "amountValue": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 60
+    },
+    "inlineStyle": {
+      "width": "900px",
+      "transform": "none",
+      "position": "relative"
+    },
+    "computed": {
+      "wrapperWidth": "842px",
+      "receiptWidth": "842px",
+      "footerMarginTop": "48px",
+      "receiptMinHeight": "396.85px"
+    }
+  },
+  "afterCanvas": {
+    "phase": "export-dom-after-canvas",
+    "wrapperRect": {
+      "left": 179,
+      "top": 297.078,
+      "right": 1021,
+      "bottom": 693.922,
+      "width": 842,
+      "height": 396.844
+    },
+    "receiptRect": {
+      "left": 0,
+      "top": 0,
+      "right": 842,
+      "bottom": 396.844,
+      "width": 842,
+      "height": 396.844
+    },
+    "amountBox": {
+      "left": 73,
+      "top": 262,
+      "right": 293,
+      "bottom": 353,
+      "width": 220,
+      "height": 91
+    },
+    "amountHeader": {
+      "left": 75,
+      "top": 264,
+      "right": 291,
+      "bottom": 291,
+      "width": 216,
+      "height": 27
+    },
+    "amountValue": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351,
+      "width": 216,
+      "height": 60
+    },
+    "inlineStyle": {
+      "width": "900px",
+      "transform": "none",
+      "position": "relative"
+    },
+    "computed": {
+      "wrapperWidth": "842px",
+      "receiptWidth": "842px",
+      "footerMarginTop": "48px",
+      "receiptMinHeight": "396.85px"
+    }
+  }
+}

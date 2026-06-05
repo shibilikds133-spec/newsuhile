@@ -1,0 +1,862 @@
+[
+  {
+    "amount": 500,
+    "fullText": "₹500/-",
+    "previewDom": {
+      "amountRect": {
+        "left": 148.734,
+        "top": 303,
+        "right": 234.984,
+        "bottom": 339,
+        "width": 86.25,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 131,
+        "top": 307,
+        "right": 144.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 131,
+        "top": 303,
+        "right": 234.984,
+        "bottom": 339,
+        "width": 103.984,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41,
+      "computedAmount": {
+        "lineHeight": "36px",
+        "fontSize": "30px",
+        "fontFamily": "\"JetBrains Mono\", monospace",
+        "fontWeight": "900",
+        "display": "block"
+      },
+      "computedRupee": {
+        "lineHeight": "32px",
+        "fontSize": "24px",
+        "fontFamily": "\"Noto Sans\", sans-serif",
+        "fontWeight": "900",
+        "marginTop": "4px"
+      },
+      "canvasTextMetrics": {
+        "actualBoundingBoxAscent": 25,
+        "actualBoundingBoxDescent": 4,
+        "fontBoundingBoxAscent": 31,
+        "fontBoundingBoxDescent": 9,
+        "width": 90
+      }
+    },
+    "exportDomBeforeCanvas": {
+      "amountRect": {
+        "left": 148.734,
+        "top": 303,
+        "right": 234.984,
+        "bottom": 339,
+        "width": 86.25,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 131,
+        "top": 307,
+        "right": 144.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 131,
+        "top": 303,
+        "right": 234.984,
+        "bottom": 339,
+        "width": 103.984,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41
+    },
+    "exportPng": {
+      "width": 1684,
+      "height": 794
+    },
+    "pdf": {
+      "pageWidth": 842,
+      "pageHeight": 397,
+      "imageX": 0,
+      "imageY": 0,
+      "imageWidth": 842,
+      "imageHeight": 397,
+      "proof": "PDF embeds the generated PNG as one image at x=0,y=0,width=canvas.width/2,height=canvas.height/2; no PDF text renderer or baseline is used."
+    },
+    "pixelGlyphs": {
+      "preview": {
+        "pixel": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 505
+        },
+        "css": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 505,
+          "topGapToValueRow": 16,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "png": {
+        "pixel": {
+          "left": 150,
+          "top": 643,
+          "right": 582,
+          "bottom": 702,
+          "width": 432,
+          "height": 59,
+          "count": 2390
+        },
+        "css": {
+          "left": 75,
+          "top": 321.5,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 29.5,
+          "count": 2390,
+          "topGapToValueRow": 30.5,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "diffCss": {
+        "top": 14.5,
+        "bottom": 0,
+        "height": -14.5,
+        "topGap": 14.5,
+        "bottomGap": 0
+      }
+    },
+    "artifacts": {
+      "previewPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\preview-500.png",
+      "exportPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\png-500.png",
+      "pdfPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\pdf-500.pdf"
+    }
+  },
+  {
+    "amount": 5000,
+    "fullText": "₹5,000/-",
+    "previewDom": {
+      "amountRect": {
+        "left": 131.484,
+        "top": 303,
+        "right": 252.234,
+        "bottom": 339,
+        "width": 120.75,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 113.75,
+        "top": 307,
+        "right": 127.484,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 113.75,
+        "top": 303,
+        "right": 252.234,
+        "bottom": 339,
+        "width": 138.484,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41,
+      "computedAmount": {
+        "lineHeight": "36px",
+        "fontSize": "30px",
+        "fontFamily": "\"JetBrains Mono\", monospace",
+        "fontWeight": "900",
+        "display": "block"
+      },
+      "computedRupee": {
+        "lineHeight": "32px",
+        "fontSize": "24px",
+        "fontFamily": "\"Noto Sans\", sans-serif",
+        "fontWeight": "900",
+        "marginTop": "4px"
+      },
+      "canvasTextMetrics": {
+        "actualBoundingBoxAscent": 25,
+        "actualBoundingBoxDescent": 5,
+        "fontBoundingBoxAscent": 31,
+        "fontBoundingBoxDescent": 9,
+        "width": 126
+      }
+    },
+    "exportDomBeforeCanvas": {
+      "amountRect": {
+        "left": 131.484,
+        "top": 303,
+        "right": 252.234,
+        "bottom": 339,
+        "width": 120.75,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 113.75,
+        "top": 307,
+        "right": 127.484,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 113.75,
+        "top": 303,
+        "right": 252.234,
+        "bottom": 339,
+        "width": 138.484,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41
+    },
+    "exportPng": {
+      "width": 1684,
+      "height": 794
+    },
+    "pdf": {
+      "pageWidth": 842,
+      "pageHeight": 397,
+      "imageX": 0,
+      "imageY": 0,
+      "imageWidth": 842,
+      "imageHeight": 397,
+      "proof": "PDF embeds the generated PNG as one image at x=0,y=0,width=canvas.width/2,height=canvas.height/2; no PDF text renderer or baseline is used."
+    },
+    "pixelGlyphs": {
+      "preview": {
+        "pixel": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 671
+        },
+        "css": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 671,
+          "topGapToValueRow": 16,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "png": {
+        "pixel": {
+          "left": 150,
+          "top": 643,
+          "right": 582,
+          "bottom": 702,
+          "width": 432,
+          "height": 59,
+          "count": 3156
+        },
+        "css": {
+          "left": 75,
+          "top": 321.5,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 29.5,
+          "count": 3156,
+          "topGapToValueRow": 30.5,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "diffCss": {
+        "top": 14.5,
+        "bottom": 0,
+        "height": -14.5,
+        "topGap": 14.5,
+        "bottomGap": 0
+      }
+    },
+    "artifacts": {
+      "previewPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\preview-5000.png",
+      "exportPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\png-5000.png",
+      "pdfPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\pdf-5000.pdf"
+    }
+  },
+  {
+    "amount": 25000,
+    "fullText": "₹25,000/-",
+    "previewDom": {
+      "amountRect": {
+        "left": 122.859,
+        "top": 303,
+        "right": 260.859,
+        "bottom": 339,
+        "width": 138,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 105.125,
+        "top": 307,
+        "right": 118.859,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859,
+        "bottom": 339,
+        "width": 155.734,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41,
+      "computedAmount": {
+        "lineHeight": "36px",
+        "fontSize": "30px",
+        "fontFamily": "\"JetBrains Mono\", monospace",
+        "fontWeight": "900",
+        "display": "block"
+      },
+      "computedRupee": {
+        "lineHeight": "32px",
+        "fontSize": "24px",
+        "fontFamily": "\"Noto Sans\", sans-serif",
+        "fontWeight": "900",
+        "marginTop": "4px"
+      },
+      "canvasTextMetrics": {
+        "actualBoundingBoxAscent": 25,
+        "actualBoundingBoxDescent": 5,
+        "fontBoundingBoxAscent": 31,
+        "fontBoundingBoxDescent": 9,
+        "width": 144
+      }
+    },
+    "exportDomBeforeCanvas": {
+      "amountRect": {
+        "left": 122.859,
+        "top": 303,
+        "right": 260.859,
+        "bottom": 339,
+        "width": 138,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 105.125,
+        "top": 307,
+        "right": 118.859,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 105.125,
+        "top": 303,
+        "right": 260.859,
+        "bottom": 339,
+        "width": 155.734,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 291,
+        "bottom": 351,
+        "width": 216,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41
+    },
+    "exportPng": {
+      "width": 1684,
+      "height": 794
+    },
+    "pdf": {
+      "pageWidth": 842,
+      "pageHeight": 397,
+      "imageX": 0,
+      "imageY": 0,
+      "imageWidth": 842,
+      "imageHeight": 397,
+      "proof": "PDF embeds the generated PNG as one image at x=0,y=0,width=canvas.width/2,height=canvas.height/2; no PDF text renderer or baseline is used."
+    },
+    "pixelGlyphs": {
+      "preview": {
+        "pixel": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 782
+        },
+        "css": {
+          "left": 75,
+          "top": 307,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 44,
+          "count": 782,
+          "topGapToValueRow": 16,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "png": {
+        "pixel": {
+          "left": 150,
+          "top": 643,
+          "right": 582,
+          "bottom": 702,
+          "width": 432,
+          "height": 59,
+          "count": 3732
+        },
+        "css": {
+          "left": 75,
+          "top": 321.5,
+          "right": 291,
+          "bottom": 351,
+          "width": 216,
+          "height": 29.5,
+          "count": 3732,
+          "topGapToValueRow": 30.5,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "diffCss": {
+        "top": 14.5,
+        "bottom": 0,
+        "height": -14.5,
+        "topGap": 14.5,
+        "bottomGap": 0
+      }
+    },
+    "artifacts": {
+      "previewPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\preview-25000.png",
+      "exportPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\png-25000.png",
+      "pdfPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\pdf-25000.pdf"
+    }
+  },
+  {
+    "amount": 125000,
+    "fullText": "₹1,25,000/-",
+    "previewDom": {
+      "amountRect": {
+        "left": 116.734,
+        "top": 303,
+        "right": 289.234,
+        "bottom": 339,
+        "width": 172.5,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 99,
+        "top": 307,
+        "right": 112.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 99,
+        "top": 303,
+        "right": 289.234,
+        "bottom": 339,
+        "width": 190.234,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 313.234,
+        "bottom": 351,
+        "width": 238.234,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41,
+      "computedAmount": {
+        "lineHeight": "36px",
+        "fontSize": "30px",
+        "fontFamily": "\"JetBrains Mono\", monospace",
+        "fontWeight": "900",
+        "display": "block"
+      },
+      "computedRupee": {
+        "lineHeight": "32px",
+        "fontSize": "24px",
+        "fontFamily": "\"Noto Sans\", sans-serif",
+        "fontWeight": "900",
+        "marginTop": "4px"
+      },
+      "canvasTextMetrics": {
+        "actualBoundingBoxAscent": 25,
+        "actualBoundingBoxDescent": 5,
+        "fontBoundingBoxAscent": 31,
+        "fontBoundingBoxDescent": 9,
+        "width": 180
+      }
+    },
+    "exportDomBeforeCanvas": {
+      "amountRect": {
+        "left": 116.734,
+        "top": 303,
+        "right": 289.234,
+        "bottom": 339,
+        "width": 172.5,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 99,
+        "top": 307,
+        "right": 112.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 99,
+        "top": 303,
+        "right": 289.234,
+        "bottom": 339,
+        "width": 190.234,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 313.234,
+        "bottom": 351,
+        "width": 238.234,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41
+    },
+    "exportPng": {
+      "width": 1684,
+      "height": 794
+    },
+    "pdf": {
+      "pageWidth": 842,
+      "pageHeight": 397,
+      "imageX": 0,
+      "imageY": 0,
+      "imageWidth": 842,
+      "imageHeight": 397,
+      "proof": "PDF embeds the generated PNG as one image at x=0,y=0,width=canvas.width/2,height=canvas.height/2; no PDF text renderer or baseline is used."
+    },
+    "pixelGlyphs": {
+      "preview": {
+        "pixel": {
+          "left": 75,
+          "top": 291,
+          "right": 314,
+          "bottom": 351,
+          "width": 239,
+          "height": 60,
+          "count": 976
+        },
+        "css": {
+          "left": 75,
+          "top": 291,
+          "right": 314,
+          "bottom": 351,
+          "width": 239,
+          "height": 60,
+          "count": 976,
+          "topGapToValueRow": 0,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "png": {
+        "pixel": {
+          "left": 150,
+          "top": 643,
+          "right": 627,
+          "bottom": 702,
+          "width": 477,
+          "height": 59,
+          "count": 4300
+        },
+        "css": {
+          "left": 75,
+          "top": 321.5,
+          "right": 313.5,
+          "bottom": 351,
+          "width": 238.5,
+          "height": 29.5,
+          "count": 4300,
+          "topGapToValueRow": 30.5,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "diffCss": {
+        "top": 30.5,
+        "bottom": 0,
+        "height": -30.5,
+        "topGap": 30.5,
+        "bottomGap": 0
+      }
+    },
+    "artifacts": {
+      "previewPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\preview-125000.png",
+      "exportPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\png-125000.png",
+      "pdfPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\pdf-125000.pdf"
+    }
+  },
+  {
+    "amount": 1250000,
+    "fullText": "₹12,50,000/-",
+    "previewDom": {
+      "amountRect": {
+        "left": 116.734,
+        "top": 303,
+        "right": 306.484,
+        "bottom": 339,
+        "width": 189.75,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 99,
+        "top": 307,
+        "right": 112.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 99,
+        "top": 303,
+        "right": 306.484,
+        "bottom": 339,
+        "width": 207.484,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 330.484,
+        "bottom": 351,
+        "width": 255.484,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41,
+      "computedAmount": {
+        "lineHeight": "36px",
+        "fontSize": "30px",
+        "fontFamily": "\"JetBrains Mono\", monospace",
+        "fontWeight": "900",
+        "display": "block"
+      },
+      "computedRupee": {
+        "lineHeight": "32px",
+        "fontSize": "24px",
+        "fontFamily": "\"Noto Sans\", sans-serif",
+        "fontWeight": "900",
+        "marginTop": "4px"
+      },
+      "canvasTextMetrics": {
+        "actualBoundingBoxAscent": 25,
+        "actualBoundingBoxDescent": 5,
+        "fontBoundingBoxAscent": 31,
+        "fontBoundingBoxDescent": 9,
+        "width": 198
+      }
+    },
+    "exportDomBeforeCanvas": {
+      "amountRect": {
+        "left": 116.734,
+        "top": 303,
+        "right": 306.484,
+        "bottom": 339,
+        "width": 189.75,
+        "height": 36
+      },
+      "rupeeRect": {
+        "left": 99,
+        "top": 307,
+        "right": 112.734,
+        "bottom": 339,
+        "width": 13.734,
+        "height": 32
+      },
+      "textUnion": {
+        "left": 99,
+        "top": 303,
+        "right": 306.484,
+        "bottom": 339,
+        "width": 207.484,
+        "height": 36
+      },
+      "valueRowRect": {
+        "left": 75,
+        "top": 291,
+        "right": 330.484,
+        "bottom": 351,
+        "width": 255.484,
+        "height": 60
+      },
+      "baselineY": 332,
+      "topGapToValueRow": 12,
+      "bottomGapToValueRow": 12,
+      "baselineFromValueRowTop": 41
+    },
+    "exportPng": {
+      "width": 1684,
+      "height": 794
+    },
+    "pdf": {
+      "pageWidth": 842,
+      "pageHeight": 397,
+      "imageX": 0,
+      "imageY": 0,
+      "imageWidth": 842,
+      "imageHeight": 397,
+      "proof": "PDF embeds the generated PNG as one image at x=0,y=0,width=canvas.width/2,height=canvas.height/2; no PDF text renderer or baseline is used."
+    },
+    "pixelGlyphs": {
+      "preview": {
+        "pixel": {
+          "left": 75,
+          "top": 291,
+          "right": 331,
+          "bottom": 351,
+          "width": 256,
+          "height": 60,
+          "count": 1082
+        },
+        "css": {
+          "left": 75,
+          "top": 291,
+          "right": 331,
+          "bottom": 351,
+          "width": 256,
+          "height": 60,
+          "count": 1082,
+          "topGapToValueRow": 0,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "png": {
+        "pixel": {
+          "left": 150,
+          "top": 643,
+          "right": 661,
+          "bottom": 702,
+          "width": 511,
+          "height": 59,
+          "count": 4968
+        },
+        "css": {
+          "left": 75,
+          "top": 321.5,
+          "right": 330.5,
+          "bottom": 351,
+          "width": 255.5,
+          "height": 29.5,
+          "count": 4968,
+          "topGapToValueRow": 30.5,
+          "bottomGapToValueRow": 0
+        }
+      },
+      "diffCss": {
+        "top": 30.5,
+        "bottom": 0,
+        "height": -30.5,
+        "topGap": 30.5,
+        "bottomGap": 0
+      }
+    },
+    "artifacts": {
+      "previewPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\preview-1250000.png",
+      "exportPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\png-1250000.png",
+      "pdfPath": "D:\\m shibili n\\suhile-main\\suhile-main\\audit-artifacts\\amount-text-audit-before\\pdf-1250000.pdf"
+    }
+  }
+]

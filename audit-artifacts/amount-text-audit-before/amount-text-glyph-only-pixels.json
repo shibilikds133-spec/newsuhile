@@ -1,0 +1,307 @@
+[
+  {
+    "amount": 500,
+    "text": "₹500/-",
+    "roi": {
+      "x0": 127,
+      "y0": 299,
+      "x1": 238.984,
+      "y1": 343
+    },
+    "preview": {
+      "pixel": {
+        "left": 152,
+        "top": 307,
+        "right": 231,
+        "bottom": 335,
+        "width": 79,
+        "height": 28,
+        "count": 503
+      },
+      "css": {
+        "left": 152,
+        "top": 307,
+        "right": 231,
+        "bottom": 335,
+        "width": 79,
+        "height": 28,
+        "count": 503,
+        "topGapToValueRow": 16,
+        "bottomGapToValueRow": 16
+      }
+    },
+    "png": {
+      "pixel": {
+        "left": 302,
+        "top": 642,
+        "right": 463,
+        "bottom": 686,
+        "width": 161,
+        "height": 44,
+        "count": 2110
+      },
+      "css": {
+        "left": 151,
+        "top": 321,
+        "right": 231.5,
+        "bottom": 343,
+        "width": 80.5,
+        "height": 22,
+        "count": 2110,
+        "topGapToValueRow": 30,
+        "bottomGapToValueRow": 8
+      }
+    },
+    "diffCss": {
+      "top": 14,
+      "bottom": 8,
+      "height": -6,
+      "topGap": 14,
+      "bottomGap": -8
+    }
+  },
+  {
+    "amount": 5000,
+    "text": "₹5,000/-",
+    "roi": {
+      "x0": 109.75,
+      "y0": 299,
+      "x1": 256.23400000000004,
+      "y1": 343
+    },
+    "preview": {
+      "pixel": {
+        "left": 134,
+        "top": 307,
+        "right": 248,
+        "bottom": 337,
+        "width": 114,
+        "height": 30,
+        "count": 663
+      },
+      "css": {
+        "left": 134,
+        "top": 307,
+        "right": 248,
+        "bottom": 337,
+        "width": 114,
+        "height": 30,
+        "count": 663,
+        "topGapToValueRow": 16,
+        "bottomGapToValueRow": 14
+      }
+    },
+    "png": {
+      "pixel": {
+        "left": 268,
+        "top": 642,
+        "right": 497,
+        "bottom": 686,
+        "width": 229,
+        "height": 44,
+        "count": 2702
+      },
+      "css": {
+        "left": 134,
+        "top": 321,
+        "right": 248.5,
+        "bottom": 343,
+        "width": 114.5,
+        "height": 22,
+        "count": 2702,
+        "topGapToValueRow": 30,
+        "bottomGapToValueRow": 8
+      }
+    },
+    "diffCss": {
+      "top": 14,
+      "bottom": 6,
+      "height": -8,
+      "topGap": 14,
+      "bottomGap": -6
+    }
+  },
+  {
+    "amount": 25000,
+    "text": "₹25,000/-",
+    "roi": {
+      "x0": 101.125,
+      "y0": 299,
+      "x1": 264.859,
+      "y1": 343
+    },
+    "preview": {
+      "pixel": {
+        "left": 125,
+        "top": 307,
+        "right": 257,
+        "bottom": 337,
+        "width": 132,
+        "height": 30,
+        "count": 787
+      },
+      "css": {
+        "left": 125,
+        "top": 307,
+        "right": 257,
+        "bottom": 337,
+        "width": 132,
+        "height": 30,
+        "count": 787,
+        "topGapToValueRow": 16,
+        "bottomGapToValueRow": 14
+      }
+    },
+    "png": {
+      "pixel": {
+        "left": 250,
+        "top": 642,
+        "right": 515,
+        "bottom": 686,
+        "width": 265,
+        "height": 44,
+        "count": 3120
+      },
+      "css": {
+        "left": 125,
+        "top": 321,
+        "right": 257.5,
+        "bottom": 343,
+        "width": 132.5,
+        "height": 22,
+        "count": 3120,
+        "topGapToValueRow": 30,
+        "bottomGapToValueRow": 8
+      }
+    },
+    "diffCss": {
+      "top": 14,
+      "bottom": 6,
+      "height": -8,
+      "topGap": 14,
+      "bottomGap": -6
+    }
+  },
+  {
+    "amount": 125000,
+    "text": "₹1,25,000/-",
+    "roi": {
+      "x0": 95,
+      "y0": 299,
+      "x1": 293.234,
+      "y1": 343
+    },
+    "preview": {
+      "pixel": {
+        "left": 120,
+        "top": 307,
+        "right": 285,
+        "bottom": 337,
+        "width": 165,
+        "height": 30,
+        "count": 914
+      },
+      "css": {
+        "left": 120,
+        "top": 307,
+        "right": 285,
+        "bottom": 337,
+        "width": 165,
+        "height": 30,
+        "count": 914,
+        "topGapToValueRow": 16,
+        "bottomGapToValueRow": 14
+      }
+    },
+    "png": {
+      "pixel": {
+        "left": 239,
+        "top": 642,
+        "right": 571,
+        "bottom": 686,
+        "width": 332,
+        "height": 44,
+        "count": 3510
+      },
+      "css": {
+        "left": 119.5,
+        "top": 321,
+        "right": 285.5,
+        "bottom": 343,
+        "width": 166,
+        "height": 22,
+        "count": 3510,
+        "topGapToValueRow": 30,
+        "bottomGapToValueRow": 8
+      }
+    },
+    "diffCss": {
+      "top": 14,
+      "bottom": 6,
+      "height": -8,
+      "topGap": 14,
+      "bottomGap": -6
+    }
+  },
+  {
+    "amount": 1250000,
+    "text": "₹12,50,000/-",
+    "roi": {
+      "x0": 95,
+      "y0": 299,
+      "x1": 310.484,
+      "y1": 343
+    },
+    "preview": {
+      "pixel": {
+        "left": 120,
+        "top": 307,
+        "right": 303,
+        "bottom": 337,
+        "width": 183,
+        "height": 30,
+        "count": 1058
+      },
+      "css": {
+        "left": 120,
+        "top": 307,
+        "right": 303,
+        "bottom": 337,
+        "width": 183,
+        "height": 30,
+        "count": 1058,
+        "topGapToValueRow": 16,
+        "bottomGapToValueRow": 14
+      }
+    },
+    "png": {
+      "pixel": {
+        "left": 239,
+        "top": 642,
+        "right": 606,
+        "bottom": 686,
+        "width": 367,
+        "height": 44,
+        "count": 4060
+      },
+      "css": {
+        "left": 119.5,
+        "top": 321,
+        "right": 303,
+        "bottom": 343,
+        "width": 183.5,
+        "height": 22,
+        "count": 4060,
+        "topGapToValueRow": 30,
+        "bottomGapToValueRow": 8
+      }
+    },
+    "diffCss": {
+      "top": 14,
+      "bottom": 6,
+      "height": -8,
+      "topGap": 14,
+      "bottomGap": -6
+    }
+  }
+]

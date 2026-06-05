@@ -1,0 +1,158 @@
+[
+  {
+    "name": "baseline-current",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 339
+    },
+    "glyph": {
+      "left": 125,
+      "top": 321,
+      "right": 257.5,
+      "bottom": 347,
+      "width": 132.5,
+      "height": 26,
+      "count": 3848
+    },
+    "topGap": 30,
+    "bottomGap": 4
+  },
+  {
+    "name": "value-row-leading-none",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 339
+    },
+    "glyph": {
+      "left": 125,
+      "top": 321,
+      "right": 257.5,
+      "bottom": 347,
+      "width": 132.5,
+      "height": 26,
+      "count": 3848
+    },
+    "topGap": 30,
+    "bottomGap": 4
+  },
+  {
+    "name": "spans-leading-none",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 345
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 333
+    },
+    "glyph": {
+      "left": 125,
+      "top": 318,
+      "right": 257.5,
+      "bottom": 341,
+      "width": 132.5,
+      "height": 23,
+      "count": 3387
+    },
+    "topGap": 27,
+    "bottomGap": 4
+  },
+  {
+    "name": "row-and-spans-leading-none",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 345
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 333
+    },
+    "glyph": {
+      "left": 125,
+      "top": 318,
+      "right": 257.5,
+      "bottom": 341,
+      "width": 132.5,
+      "height": 23,
+      "count": 3387
+    },
+    "topGap": 27,
+    "bottomGap": 4
+  },
+  {
+    "name": "inline-flex-spans",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 339
+    },
+    "glyph": {
+      "left": 125,
+      "top": 321,
+      "right": 257.5,
+      "bottom": 347,
+      "width": 132.5,
+      "height": 26,
+      "count": 3848
+    },
+    "topGap": 30,
+    "bottomGap": 4
+  },
+  {
+    "name": "grid-row",
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 339
+    },
+    "glyph": {
+      "left": 125,
+      "top": 321,
+      "right": 257.5,
+      "bottom": 347,
+      "width": 132.5,
+      "height": 26,
+      "count": 3848
+    },
+    "topGap": 30,
+    "bottomGap": 4
+  }
+]

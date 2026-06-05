@@ -1,0 +1,44 @@
+{
+  "styleName": "none",
+  "meta": {
+    "row": {
+      "left": 75,
+      "top": 291,
+      "right": 291,
+      "bottom": 351
+    },
+    "union": {
+      "left": 105.125,
+      "top": 303,
+      "right": 260.859375,
+      "bottom": 339
+    }
+  },
+  "preview": {
+    "left": 125,
+    "top": 307,
+    "right": 257,
+    "bottom": 337,
+    "width": 132,
+    "height": 30,
+    "count": 787
+  },
+  "png": {
+    "left": 125,
+    "top": 321,
+    "right": 257.5,
+    "bottom": 347,
+    "width": 132.5,
+    "height": 26,
+    "count": 3848
+  },
+  "diff": {
+    "top": 14,
+    "bottom": 10,
+    "height": -4,
+    "previewTopGap": 16,
+    "previewBottomGap": 14,
+    "pngTopGap": 30,
+    "pngBottomGap": 4
+  }
+}
