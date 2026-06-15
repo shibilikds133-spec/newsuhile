@@ -13,7 +13,7 @@ export default function Voucher({ record }) {
       <div className="absolute left-0 top-0 bottom-0 w-10 md:w-12 bg-slate-800 flex flex-col items-center justify-start text-white overflow-hidden">
         {/* Logo at top of sidebar */}
         <div className="w-8 h-8 md:w-10 md:h-10 mt-2 bg-white rounded-full overflow-hidden flex-shrink-0 border border-slate-500 p-0.5">
-          <img src="./image/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <img src="/image/logo.png" alt="Logo" className="w-full h-full object-contain" />
         </div>
         {/* Rotated text */}
         <div className="flex-1 flex items-center justify-center">
@@ -29,7 +29,7 @@ export default function Voucher({ record }) {
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-slate-800 overflow-hidden p-0.5">
-               <img src="./image/logo.png" alt="Logo" className="w-full h-full object-contain" />
+               <img src="/image/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-800 tracking-tighter leading-none mb-0.5 uppercase">
