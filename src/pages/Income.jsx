@@ -61,14 +61,15 @@ export default function Income() {
         id: newId(),
         type: 'income',
         donationType: isDonation ? 'Donation' : values.category,
-        digitalReceiptNo: nextNo,
+        seqNo: nextNo.seqNo,
+        digitalReceiptNo: nextNo.digitalReceiptNo,
         amount: Number(values.amount),
         created_at: new Date().toISOString()
       };
       
       addIncome(record);
       form.resetForm();
-      toast.success(`Income added — Receipt #${nextNo}`);
+      toast.success(`Income added — Receipt #${nextNo.digitalReceiptNo}`);
       setPreviewRecord(record);
 
       if (record.contactNo) {

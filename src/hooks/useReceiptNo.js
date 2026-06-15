@@ -13,7 +13,12 @@ export function useReceiptNo() {
     const syncMax = async () => {
       try {
         const allIncome = await db.income.toArray();
-        const dbMax = Math.max(0, ...allIncome.map(r => r.digitalReceiptNo || 0));
+        const dbMax = Math.max(0, ...allIncome.map(r => {
+          if (r.seqNo) return r.seqNo;
+          if (typeof r.digitalReceiptNo === 'number') return r.digitalReceiptNo;
+          // Fallback if string but no seqNo (shouldn't happen with new logic, but safe)
+          return 0;
+        }));
 
         if (dbMax >= receiptNo) {
           const next = dbMax + 1;
@@ -28,10 +33,20 @@ export function useReceiptNo() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const incrementReceiptNo = () => {
-    const next = receiptNo + 1;
-    setReceiptNo(next);
-    localStorage.setItem('dawa_receipt_seq', next);
-    return receiptNo; // return the current one before increment
+    const currentSeq = receiptNo;
+    const nextSeq = receiptNo + 1;
+    
+    setReceiptNo(nextSeq);
+    localStorage.setItem('dawa_receipt_seq', nextSeq);
+    
+    // Generate formatted receipt number based on current date
+    const now = new Date();
+    const d = now.getDate(); // e.g., 15
+    const m = now.getMonth() + 1; // e.g., 6
+    const y = String(now.getFullYear()).slice(-2); // e.g., 26
+    const formatted = `${currentSeq}${d}${m}${y}`;
+
+    return { seqNo: currentSeq, digitalReceiptNo: formatted };
   };
 
   return { nextReceiptNo: receiptNo, incrementReceiptNo };
