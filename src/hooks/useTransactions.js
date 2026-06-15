@@ -76,7 +76,7 @@ export function useTransactions() {
     setGlobalSyncStatus('syncing');
     try {
       if (!navigator.onLine) throw new Error('Offline');
-      const { synced, sync_status, is_deleted, ...recordToSync } = record;
+      const { synced, sync_status, is_deleted, seqNo, ...recordToSync } = record;
       const { error } = await supabase
         .from(table)
         .upsert([recordToSync], { onConflict: 'id' });
