@@ -106,7 +106,7 @@ export default function Receipt({ record }) {
               <div className="bg-teal-700 text-teal-50 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 text-center flex items-center justify-center gap-2">
                 Amount Received
               </div>
-              <div className="px-6 py-4 flex items-baseline justify-center gap-1 bg-gradient-to-b from-teal-50/50 to-teal-100/50">
+              <div className="px-6 py-4 flex items-baseline justify-center gap-1 bg-teal-50">
                 <span className="text-2xl font-black text-teal-800 opacity-80 leading-none">₹</span>
                 <span className="text-3xl font-black text-teal-900 font-mono tracking-tight leading-none">
                   {formatINR(record.amount).replace('₹', '').trim()}/-
