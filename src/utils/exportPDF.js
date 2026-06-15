@@ -28,12 +28,14 @@ export const exportTablePDF = async (elementId, filename) => {
   // Keeping fallback for simple table snapshot exports
   const element = document.getElementById(elementId);
   if (!element) return;
-  const html2canvas = (await import('html2canvas')).default;
-  const canvas = await html2canvas(element, { scale: 2 });
-  const imgData = canvas.toDataURL('image/png');
+  const htmlToImage = await import('html-to-image');
+  const imgData = await htmlToImage.toPng(element, { pixelRatio: 2, backgroundColor: '#ffffff' });
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
+  
+  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  
   if (window.electronAPI && window.electronAPI.downloadFile) {
     const arrayBuffer = pdf.output('arraybuffer');
     await window.electronAPI.downloadFile(arrayBuffer, filename);
@@ -46,12 +48,14 @@ export const exportDocumentPDF = async (elementId, filename) => {
   // Keeping fallback for simple snapshot document exports
   const element = document.getElementById(elementId);
   if (!element) return;
-  const html2canvas = (await import('html2canvas')).default;
-  const canvas = await html2canvas(element, { scale: 2 });
-  const imgData = canvas.toDataURL('image/png');
+  const htmlToImage = await import('html-to-image');
+  const imgData = await htmlToImage.toPng(element, { pixelRatio: 2, backgroundColor: '#ffffff' });
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
   const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
+  
+  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  
   if (window.electronAPI && window.electronAPI.downloadFile) {
     const arrayBuffer = pdf.output('arraybuffer');
     await window.electronAPI.downloadFile(arrayBuffer, filename);

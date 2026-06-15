@@ -106,38 +106,11 @@ export default function Receipt({ record }) {
               <div className="bg-teal-700 text-teal-50 text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 text-center flex items-center justify-center gap-2">
                 Amount Received
               </div>
-              <div className="px-6 py-3 flex items-center justify-center gap-1 bg-gradient-to-b from-teal-50/50 to-teal-100/50">
-                <svg
-                  className="w-full h-9 overflow-visible"
-                  viewBox="0 0 216 36"
-                  role="img"
-                  aria-label={`₹ ${formatINR(record.amount).replace('₹', '').trim()}/-`}
-                >
-                  <text
-                    x="108"
-                    y="18"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fill="#134e4a"
-                    fontWeight="900"
-                    letterSpacing="-0.75px"
-                  >
-                    <tspan
-                      fontFamily="Noto Sans, sans-serif"
-                      fontSize="24"
-                      opacity="0.8"
-                    >
-                      ₹
-                    </tspan>
-                    <tspan
-                      dx="4"
-                      fontFamily="JetBrains Mono, monospace"
-                      fontSize="30"
-                    >
-                      {formatINR(record.amount).replace('₹', '').trim()}/-
-                    </tspan>
-                  </text>
-                </svg>
+              <div className="px-6 py-4 flex items-baseline justify-center gap-1 bg-gradient-to-b from-teal-50/50 to-teal-100/50">
+                <span className="text-2xl font-black text-teal-800 opacity-80 leading-none">₹</span>
+                <span className="text-3xl font-black text-teal-900 font-mono tracking-tight leading-none">
+                  {formatINR(record.amount).replace('₹', '').trim()}/-
+                </span>
               </div>
             </div>
           </div>

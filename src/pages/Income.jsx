@@ -19,7 +19,7 @@ import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import Receipt from '../components/documents/Receipt';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import { X, Share2, Download, Image, Printer, FileText } from 'lucide-react';
 
 export default function Income() {
@@ -102,17 +102,7 @@ export default function Income() {
     }, 150);
   };
 
-  const handleDownloadReceiptPDFExperimental = async (record) => {
-    toast.loading('Generating PDF...', { id: 'pdf-exp' });
-    setTimeout(async () => {
-      try {
-        await exportReceiptAsPDFExperimental(record, `receipt-${record.manualReceiptNo || record.digitalReceiptNo}`);
-        toast.success('Downloaded!', { id: 'pdf-exp' });
-      } catch (e) {
-        toast.error('Failed to generate PDF', { id: 'pdf-exp' });
-      }
-    }, 150);
-  };
+
 
   const handleShareJPG = (record) => {
     const el = document.getElementById('receipt-element');
@@ -130,23 +120,19 @@ export default function Income() {
       el.style.position  = 'relative';
 
       try {
-        const canvas = await html2canvas(el, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
+        const jpgDataUrl = await htmlToImage.toJpeg(el, {
+          pixelRatio: 3,
           backgroundColor: '#ffffff',
-          logging: false,
-          imageTimeout: 0,
-          windowWidth: 900,
-          scrollX: 0,
-          scrollY: -window.scrollY,
+          style: {
+            width: '900px',
+            transform: 'none',
+            position: 'relative'
+          }
         });
 
         el.style.width     = originalWidth;
         el.style.transform = originalTransform;
         el.style.position  = originalPosition;
-
-        const jpgDataUrl = canvas.toDataURL('image/jpeg', 0.95);
         const res = await fetch(jpgDataUrl);
         const blob = await res.blob();
         const fileName = `receipt-${record.manualReceiptNo || record.digitalReceiptNo}.jpg`;
@@ -360,7 +346,6 @@ export default function Income() {
                 <Button variant="secondary" onClick={() => handleShareJPG(previewRecord)} className="text-xs px-2 py-1">📷 Share as JPG</Button>
                 <Button variant="secondary" onClick={() => window.print()} className="text-xs px-2 py-1">Print</Button>
                 <Button variant="primary" onClick={() => handleDownloadReceiptPDF(previewRecord)} className="text-xs px-2 py-1">Download PDF</Button>
-                <Button variant="secondary" id="btn-export-experimental" onClick={() => handleDownloadReceiptPDFExperimental(previewRecord)} className="text-xs px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white border-0">Export (Exp)</Button>
               </div>
             </div>
 
@@ -453,13 +438,7 @@ export default function Income() {
                   <span>Print Receipt</span>
                 </button>
 
-                <button
-                  onClick={() => handleDownloadReceiptPDFExperimental(previewRecord)}
-                  className="flex flex-col items-center justify-center gap-2 bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-700 p-4 rounded-xl font-bold text-xs shadow-sm transition-all active:scale-[0.98]"
-                >
-                  <FileText size={20} />
-                  <span>Export (Exp)</span>
-                </button>
+
               </div>
 
               <button
@@ -470,8 +449,8 @@ export default function Income() {
               </button>
             </div>
 
-            {/* Receipt content — scrollable + auto-scaled on mobile */}
-            <div className="hidden md:flex flex-1 overflow-auto bg-gray-200 print-content p-4 md:p-8 justify-center items-start">
+            {/* Receipt content — off-screen on mobile so html2canvas can still capture it, visible on desktop */}
+            <div className="flex flex-1 overflow-auto bg-gray-200 print-content p-4 md:p-8 justify-center items-start absolute -left-[9999px] md:relative md:left-auto">
               <div
                 id="receipt-element"
                 style={{
