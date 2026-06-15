@@ -9,6 +9,7 @@ export default function Receipt({ record }) {
 
   return (
     <div 
+      id="receipt-inner"
       className="receipt-landscape bg-white shadow-2xl relative border border-gray-200"
       style={{ width: '842px', minHeight: '105mm', transformOrigin: 'top left' }}
     >

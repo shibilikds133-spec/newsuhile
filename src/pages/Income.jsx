@@ -105,34 +105,22 @@ export default function Income() {
 
 
   const handleShareJPG = (record) => {
-    const el = document.getElementById('receipt-element');
+    const el = document.getElementById('receipt-inner');
     if (!el) return;
 
     toast.loading('Preparing image...', { id: 'share' });
 
-    // ✅ Force desktop width before capture so mobile doesn't cause text overlap
     setTimeout(async () => {
-      const originalWidth     = el.style.width;
-      const originalTransform = el.style.transform;
-      const originalPosition  = el.style.position;
-      el.style.width     = '900px';
-      el.style.transform = 'none';
-      el.style.position  = 'relative';
-
       try {
         const jpgDataUrl = await htmlToImage.toJpeg(el, {
           pixelRatio: 3,
           backgroundColor: '#ffffff',
           style: {
-            width: '900px',
             transform: 'none',
-            position: 'relative'
+            position: 'relative',
+            margin: '0'
           }
         });
-
-        el.style.width     = originalWidth;
-        el.style.transform = originalTransform;
-        el.style.position  = originalPosition;
         const res = await fetch(jpgDataUrl);
         const blob = await res.blob();
         const fileName = `receipt-${record.manualReceiptNo || record.digitalReceiptNo}.jpg`;
@@ -153,9 +141,6 @@ export default function Income() {
           toast.success('Receipt saved as JPG!', { id: 'share' });
         }
       } catch (e) {
-        el.style.width     = originalWidth;
-        el.style.transform = originalTransform;
-        el.style.position  = originalPosition;
         console.error(e);
         toast.error('Failed to export receipt as image.', { id: 'share' });
       }
