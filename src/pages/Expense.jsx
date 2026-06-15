@@ -199,7 +199,6 @@ export default function Expense() {
                 {EXPENSE_CATEGORIES.map(cat => <option key={cat} value={cat} />)}
               </datalist>
             </div>
-            <Input label="Manual Voucher No" name="manualVoucherNo" value={form.values.manualVoucherNo} onChange={form.handleChange} />
             <Input label="Paid To" name="paidTo" required value={form.values.paidTo} onChange={form.handleChange} error={form.errors.paidTo} />
             
             <div className="md:col-span-2 lg:col-span-3">

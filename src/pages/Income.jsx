@@ -227,7 +227,6 @@ export default function Income() {
                 {INCOME_CATEGORIES.map(cat => <option key={cat} value={cat} />)}
               </datalist>
             </div>
-            <Input label="Manual Receipt No" name="manualReceiptNo" value={form.values.manualReceiptNo} onChange={form.handleChange} />
             
             <Input label="Payer Name" name="payerName" required value={form.values.payerName} onChange={form.handleChange} error={form.errors.payerName} />
             <Input label="Address" name="address" value={form.values.address} onChange={form.handleChange} />
