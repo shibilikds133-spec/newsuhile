@@ -15,7 +15,6 @@ jobs:
 
       - name: Load .env and Ping Supabase REST API
         run: |
-          # Read the URL and Anon Key directly from the .env file
           source .env
           
           echo "Pinging Supabase to keep project active..."
@@ -27,8 +26,8 @@ jobs:
           echo "Response Status: $STATUS_CODE"
           
           if [ "$STATUS_CODE" -eq 200 ]; then
-            echo "✅ Ping successful! Supabase project is active."
+            echo "Ping successful! Supabase project is active."
           else
-            echo "❌ Ping failed. Check if URL and Key are correct."
+            echo "Ping failed. Check if URL and Key are correct."
             exit 1
           fi
