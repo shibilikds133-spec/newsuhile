@@ -18,15 +18,18 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import Receipt from '../components/documents/Receipt';
+import StatusBadge from '../components/ui/StatusBadge';
+import DropdownMenu from '../components/ui/DropdownMenu';
 import jsPDF from 'jspdf';
 import * as htmlToImage from 'html-to-image';
 import { X, Share2, Download, Image, Printer, FileText } from 'lucide-react';
 
 export default function Income() {
-  const { income, addIncome, deleteRecord, totalIncome } = useTransactions();
+  const { income, addIncome, deleteRecord, updatePaymentStatus, totalIncome } = useTransactions();
   const { incrementReceiptNo } = useReceiptNo();
   
   const [deleteId, setDeleteId] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
   const [previewRecord, setPreviewRecord] = useState(null);
   const [whatsappPromptRecord, setWhatsappPromptRecord] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -50,6 +53,7 @@ export default function Income() {
       manualReceiptNo: '',
       amount: '',
       amountInWords: '',
+      paymentStatus: '',
     },
     validate: validators.income,
     onSubmit: (values) => {
@@ -155,18 +159,22 @@ export default function Income() {
     { key: 'donationType', label: 'Donation Type' },
     { key: 'payerName', label: 'Payer Name' },
     { key: 'amount', label: 'Amount', render: r => <span className="font-semibold text-primary">{formatINR(r.amount)}</span> },
+    { key: 'status', label: 'Status', render: r => <StatusBadge status={r.paymentStatus || 'Received'} /> },
     { 
       key: 'actions', 
       label: 'Actions', 
       render: (r) => (
-        <div className="flex gap-2 flex-nowrap shrink-0">
-          <Button variant="secondary" onClick={() => setPreviewRecord(r)} className="px-2 py-1 text-xs">
+        <DropdownMenu>
+          <Button variant="secondary" onClick={() => setPreviewRecord(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
             Receipt
           </Button>
-          <Button variant="danger" onClick={() => setDeleteId(r.id)} className="px-2 py-1 text-xs">
+          <Button variant="secondary" onClick={() => setPaymentId(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
+            {(r.paymentStatus === 'Received' || !r.paymentStatus) ? 'Mark Pending' : 'Mark Received'}
+          </Button>
+          <Button variant="danger" onClick={() => setDeleteId(r.id)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-red-50 !text-red-600">
             Delete
           </Button>
-        </div>
+        </DropdownMenu>
       ) 
     }
   ];
@@ -227,13 +235,28 @@ export default function Income() {
                 {INCOME_CATEGORIES.map(cat => <option key={cat} value={cat} />)}
               </datalist>
             </div>
+            <Input label="Manual Receipt No" name="manualReceiptNo" value={form.values.manualReceiptNo} onChange={form.handleChange} />
             
             <Input label="Payer Name" name="payerName" required value={form.values.payerName} onChange={form.handleChange} error={form.errors.payerName} />
             <Input label="Address" name="address" value={form.values.address} onChange={form.handleChange} />
             <Input label="Contact No" name="contactNo" value={form.values.contactNo} onChange={form.handleChange} />
             
             <Input label="Amount (₹)" name="amount" type="number" min="1" required value={form.values.amount} onChange={handleAmountChange} error={form.errors.amount} />
-            <div className="lg:col-span-2">
+            <div className="flex flex-col gap-1">
+              <Select 
+                label="Payment Status" 
+                name="paymentStatus" 
+                required 
+                value={form.values.paymentStatus} 
+                onChange={form.handleChange}
+                error={form.errors.paymentStatus}
+              >
+                <option value="">Select Status...</option>
+                <option value="Received">Received</option>
+                <option value="Pending">Pending</option>
+              </Select>
+            </div>
+            <div className="lg:col-span-1">
               <Input label="Amount in Words" name="amountInWords" value={form.values.amountInWords} onChange={form.handleChange} />
             </div>
           </div>
@@ -296,6 +319,20 @@ export default function Income() {
       />
 
       <Modal 
+        isOpen={!!paymentId} 
+        title="Change Payment Status" 
+        message={`Are you sure you want to change the status of this income to ${(paymentId?.paymentStatus === 'Received' || !paymentId?.paymentStatus) ? 'Pending' : 'Received'}?`}
+        confirmVariant="primary"
+        confirmLabel="Yes, Change Status"
+        onCancel={() => setPaymentId(null)}
+        onConfirm={() => {
+          updatePaymentStatus(paymentId.id, 'income');
+          setPaymentId(null);
+          toast.success('Status updated');
+        }}
+      />
+
+      <Modal  
         isOpen={!!whatsappPromptRecord} 
         title="Send Receipt via WhatsApp?" 
         message={`Would you like to send the receipt details to ${whatsappPromptRecord?.payerName} at ${whatsappPromptRecord?.contactNo}?`}

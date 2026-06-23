@@ -14,10 +14,13 @@ import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
+import StatusBadge from '../components/ui/StatusBadge';
+import DropdownMenu from '../components/ui/DropdownMenu';
 
 export default function Refreshment() {
-  const { refreshments, addRefreshment, deleteRecord, totalRefreshment } = useTransactions();
+  const { refreshments, addRefreshment, deleteRecord, updatePaymentStatus, totalRefreshment } = useTransactions();
   const [deleteId, setDeleteId] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
 
   const form = useForm({
     initialValues: {
@@ -25,7 +28,8 @@ export default function Refreshment() {
       item: '',
       quantity: 1,
       amount: '',
-      notes: ''
+      notes: '',
+      paymentStatus: ''
     },
     validate: validators.refreshment,
     onSubmit: (values) => {
@@ -50,13 +54,19 @@ export default function Refreshment() {
     { key: 'quantity', label: 'Quantity' },
     { key: 'notes', label: 'Notes' },
     { key: 'amount', label: 'Amount', render: r => <span className="font-semibold text-warning">{formatINR(r.amount)}</span> },
+    { key: 'status', label: 'Status', render: r => <StatusBadge status={r.paymentStatus || 'Paid'} /> },
     { 
       key: 'actions', 
       label: 'Actions', 
       render: (r) => (
-        <Button variant="danger" onClick={() => setDeleteId(r.id)} className="px-2 py-1 text-xs">
-          Delete
-        </Button>
+        <DropdownMenu>
+          <Button variant="secondary" onClick={() => setPaymentId(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
+            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Unpaid' : 'Mark Paid'}
+          </Button>
+          <Button variant="danger" onClick={() => setDeleteId(r.id)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-red-50 !text-red-600">
+            Delete
+          </Button>
+        </DropdownMenu>
       ) 
     }
   ];
@@ -78,6 +88,20 @@ export default function Refreshment() {
             <Select label="Item" name="item" options={REFRESHMENT_ITEMS} required value={form.values.item} onChange={form.handleChange} error={form.errors.item} />
             <Input label="Qty" name="quantity" type="number" min="1" required value={form.values.quantity} onChange={form.handleChange} error={form.errors.quantity} />
             <Input label="Amount (₹)" name="amount" type="number" min="1" required value={form.values.amount} onChange={form.handleChange} error={form.errors.amount} />
+            <div className="flex flex-col gap-1">
+              <Select 
+                label="Payment Status" 
+                name="paymentStatus" 
+                required 
+                value={form.values.paymentStatus} 
+                onChange={form.handleChange}
+                error={form.errors.paymentStatus}
+              >
+                <option value="">Select Status...</option>
+                <option value="Paid">Paid</option>
+                <option value="Unpaid">Unpaid</option>
+              </Select>
+            </div>
             <Input label="Notes" name="notes" value={form.values.notes} onChange={form.handleChange} />
           </div>
           <div className="flex justify-end pt-4 border-t border-border">
@@ -129,6 +153,20 @@ export default function Refreshment() {
           deleteRecord(deleteId, 'refreshment');
           setDeleteId(null);
           toast.success('Record deleted');
+        }}
+      />
+
+      <Modal 
+        isOpen={!!paymentId} 
+        title="Change Payment Status" 
+        message={`Are you sure you want to change the status of this refreshment to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Unpaid' : 'Paid'}?`}
+        confirmVariant="primary"
+        confirmLabel="Yes, Change Status"
+        onCancel={() => setPaymentId(null)}
+        onConfirm={() => {
+          updatePaymentStatus(paymentId.id, 'refreshment');
+          setPaymentId(null);
+          toast.success('Status updated');
         }}
       />
     </div>

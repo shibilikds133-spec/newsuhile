@@ -53,9 +53,9 @@ export function useTransactions() {
 
         // Merge remote data into local keeping local 'pending' items safe
         await db.transaction('rw', db.income, db.expenses, db.refreshments, async () => {
-          if (incomeData) await db.income.bulkPut(incomeData.map(r => ({ ...r, synced: true, sync_status: 'synced' })));
-          if (expenseData) await db.expenses.bulkPut(expenseData.map(r => ({ ...r, synced: true, sync_status: 'synced' })));
-          if (refreshData) await db.refreshments.bulkPut(refreshData.map(r => ({ ...r, synced: true, sync_status: 'synced' })));
+          if (incomeData) await db.income.bulkPut(incomeData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Received', synced: true, sync_status: 'synced' })));
+          if (expenseData) await db.expenses.bulkPut(expenseData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Paid', synced: true, sync_status: 'synced' })));
+          if (refreshData) await db.refreshments.bulkPut(refreshData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Paid', synced: true, sync_status: 'synced' })));
         });
 
         if (isMounted) setGlobalSyncStatus('synced');
@@ -76,7 +76,7 @@ export function useTransactions() {
     setGlobalSyncStatus('syncing');
     try {
       if (!navigator.onLine) throw new Error('Offline');
-      const { synced, sync_status, is_deleted, seqNo, ...recordToSync } = record;
+      const { synced, sync_status, is_deleted, ...recordToSync } = record;
       const { error } = await supabase
         .from(table)
         .upsert([recordToSync], { onConflict: 'id' });
@@ -102,19 +102,19 @@ export function useTransactions() {
   };
 
   const addIncome = async (record) => {
-    const newRecord = { ...record, synced: false, sync_status: 'pending' };
+    const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Received', synced: false, sync_status: 'pending' };
     await db.income.put(newRecord);
     await pushToCloud('income', newRecord);
   };
 
   const addExpense = async (record) => {
-    const newRecord = { ...record, synced: false, sync_status: 'pending' };
+    const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Paid', synced: false, sync_status: 'pending' };
     await db.expenses.put(newRecord);
     await pushToCloud('expenses', newRecord);
   };
 
   const addRefreshment = async (record) => {
-    const newRecord = { ...record, synced: false, sync_status: 'pending' };
+    const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Paid', synced: false, sync_status: 'pending' };
     await db.refreshments.put(newRecord);
     await pushToCloud('refreshments', newRecord);
   };
@@ -139,18 +139,27 @@ export function useTransactions() {
     }
   };
 
-  const updatePaymentStatus = async (id) => {
-    const record = await db.expenses.get(id);
+  const updatePaymentStatus = async (id, type = 'expense') => {
+    const tableName = type === 'income' ? 'income' : type === 'refreshment' ? 'refreshments' : 'expenses';
+    const record = await db[tableName].get(id);
     if (!record) return;
-    const newStatus = record.paymentStatus === 'Paid' ? 'Unpaid' : 'Paid';
-    await db.expenses.update(id, { paymentStatus: newStatus, synced: false, sync_status: 'pending' });
+    
+    // Toggle logic based on type
+    let newStatus = 'Paid';
+    if (type === 'income') {
+      newStatus = (record.paymentStatus === 'Received' || !record.paymentStatus) ? 'Pending' : 'Received';
+    } else {
+      newStatus = (record.paymentStatus === 'Paid' || !record.paymentStatus) ? 'Unpaid' : 'Paid';
+    }
+
+    await db[tableName].update(id, { paymentStatus: newStatus, synced: false, sync_status: 'pending' });
 
     setGlobalSyncStatus('syncing');
     try {
       if (!navigator.onLine) throw new Error('Offline');
-      const { error } = await supabase.from('expenses').update({ paymentStatus: newStatus }).eq('id', id);
+      const { error } = await supabase.from(tableName).update({ paymentStatus: newStatus }).eq('id', id);
       if (error) throw error;
-      await db.expenses.update(id, { synced: true, sync_status: 'synced' });
+      await db[tableName].update(id, { synced: true, sync_status: 'synced' });
       setGlobalSyncStatus('synced');
     } catch (error) {
       console.warn('Update status error:', error);

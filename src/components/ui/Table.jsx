@@ -15,7 +15,7 @@ export default function Table({ columns, data, className = '' }) {
   const remaining = data.length - visibleCount;
 
   return (
-    <div className={`overflow-hidden rounded-lg border border-border bg-white ${className}`}>
+    <div className={`md:overflow-hidden rounded-lg border border-border bg-white ${className}`}>
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">

@@ -17,6 +17,7 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
 import StatusBadge from '../components/ui/StatusBadge';
+import DropdownMenu from '../components/ui/DropdownMenu';
 import Voucher from '../components/documents/Voucher';
 import { exportVoucherAsPDF } from '../utils/exportPDF';
 import { X, Download, Printer } from 'lucide-react';
@@ -109,19 +110,17 @@ export default function Expense() {
       key: 'actions', 
       label: 'Actions', 
       render: (r) => (
-        <div className="flex gap-2 flex-nowrap shrink-0">
-          {r.paymentStatus === 'Unpaid' && (
-            <Button variant="secondary" onClick={() => setPaymentId(r.id)} className="px-2 py-1 text-xs">
-              Mark Paid
-            </Button>
-          )}
-          <Button variant="secondary" onClick={() => setPreviewRecord(r)} className="px-2 py-1 text-xs">
+        <DropdownMenu>
+          <Button variant="secondary" onClick={() => setPaymentId(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
+            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Unpaid' : 'Mark Paid'}
+          </Button>
+          <Button variant="secondary" onClick={() => setPreviewRecord(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
             Voucher
           </Button>
-          <Button variant="danger" onClick={() => setDeleteId(r.id)} className="px-2 py-1 text-xs">
-            Del
+          <Button variant="danger" onClick={() => setDeleteId(r.id)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-red-50 !text-red-600">
+            Delete
           </Button>
-        </div>
+        </DropdownMenu>
       ) 
     }
   ];
@@ -199,6 +198,7 @@ export default function Expense() {
                 {EXPENSE_CATEGORIES.map(cat => <option key={cat} value={cat} />)}
               </datalist>
             </div>
+            <Input label="Manual Voucher No" name="manualVoucherNo" value={form.values.manualVoucherNo} onChange={form.handleChange} />
             <Input label="Paid To" name="paidTo" required value={form.values.paidTo} onChange={form.handleChange} error={form.errors.paidTo} />
             
             <div className="md:col-span-2 lg:col-span-3">
@@ -289,13 +289,13 @@ export default function Expense() {
 
       <Modal 
         isOpen={!!paymentId} 
-        title="Mark as Paid" 
-        message="Are you sure you want to change the status of this expense to Paid?"
+        title="Change Payment Status" 
+        message={`Are you sure you want to change the status of this expense to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Unpaid' : 'Paid'}?`}
         confirmVariant="primary"
-        confirmLabel="Confirm"
+        confirmLabel="Yes, Change Status"
         onCancel={() => setPaymentId(null)}
         onConfirm={() => {
-          updatePaymentStatus(paymentId);
+          updatePaymentStatus(paymentId.id, 'expense');
           setPaymentId(null);
           toast.success('Status updated');
         }}

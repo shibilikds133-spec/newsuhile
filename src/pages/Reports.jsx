@@ -4,6 +4,7 @@ import { formatINR, formatDate, todayISO } from '../utils/formatters';
 import { exportTablePDF } from '../utils/exportPDF';
 import { exportToExcel } from '../utils/exportExcel';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths } from 'date-fns';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, REFRESHMENT_ITEMS } from '../constants/categories';
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
 
@@ -51,8 +52,9 @@ export default function Reports() {
     const cat = t.category || t.item;
     if (expenseCategoryFilter !== 'All' && cat !== expenseCategoryFilter) return false;
 
-    if (t.type === 'expense') {
-      if (paymentFilter !== 'All' && t.paymentStatus !== paymentFilter) return false;
+    if (paymentFilter !== 'All') {
+      const status = t.paymentStatus || (t.type === 'income' ? 'Received' : 'Paid');
+      if (status !== paymentFilter) return false;
     }
     
     if (fromDate && t.date < fromDate) return false;
@@ -65,9 +67,18 @@ export default function Reports() {
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-  // Only PAID expenses count towards real cash spent
+  // Calculate total expense dynamically based on the payment filter
   const totalExpenseValue = filteredData
-    .filter(t => (t.type === 'expense' && t.paymentStatus === 'Paid') || t.type === 'refreshment')
+    .filter(t => {
+      if (t.type === 'refreshment') return true;
+      if (t.type === 'expense') {
+        // If user explicitly filtered for Unpaid, show Unpaid total
+        if (paymentFilter === 'Unpaid') return t.paymentStatus === 'Unpaid';
+        // Otherwise, only count Paid expenses towards cash spent
+        return t.paymentStatus === 'Paid';
+      }
+      return false;
+    })
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const netBalanceValue = totalIncomeValue - totalExpenseValue;
@@ -89,7 +100,14 @@ export default function Reports() {
     { 
       key: 'status', 
       label: 'Status', 
-      render: r => r.type === 'expense' ? <StatusBadge status={r.paymentStatus} /> : '-' 
+      render: r => {
+        let status = r.paymentStatus;
+        if (!status) {
+          if (r.type === 'income') status = 'Received';
+          else status = 'Paid';
+        }
+        return <StatusBadge status={status} />;
+      } 
     }
   ];
 
@@ -100,9 +118,16 @@ export default function Reports() {
       if (printFrom && t.date < printFrom) return false;
       if (printTo && t.date > printTo) return false;
       const cat = t.category || t.item;
-      if (categories.length > 0 && !categories.includes(cat)) return false;
-      if (t.type === 'expense' && paymentStatus !== 'All') {
-        if (t.paymentStatus !== paymentStatus) return false;
+      if (categories.length > 0) {
+        let isMatch = categories.includes(cat);
+        if (!isMatch && t.type === 'income' && categories.includes('OTHER INCOME') && !INCOME_CATEGORIES.includes(cat)) isMatch = true;
+        if (!isMatch && t.type === 'expense' && categories.includes('OTHER EXPENSE') && !EXPENSE_CATEGORIES.includes(cat)) isMatch = true;
+        if (!isMatch && t.type === 'refreshment' && categories.includes('OTHER REFRESHMENT') && !REFRESHMENT_ITEMS.includes(cat)) isMatch = true;
+        if (!isMatch) return false;
+      }
+      if (paymentStatus !== 'All') {
+        const status = t.paymentStatus || (t.type === 'income' ? 'Received' : 'Paid');
+        if (status !== paymentStatus) return false;
       }
       return true;
     });
@@ -146,7 +171,11 @@ export default function Reports() {
               {['All', 'Income', 'Expense', 'Refreshment'].map(f => (
                 <button
                   key={f}
-                  onClick={() => setTypeFilter(f)}
+                  onClick={() => {
+                    setTypeFilter(f);
+                    setExpenseCategoryFilter('All');
+                    setPaymentFilter('All');
+                  }}
                   className={`flex-1 text-xs py-1 rounded ${typeFilter === f ? 'bg-white shadow text-text' : 'text-muted'}`}
                 >
                   {f}
@@ -166,13 +195,22 @@ export default function Reports() {
                   ))}
                 </select>
               </div>
-              {typeFilter === 'Expense' && (
+              {typeFilter !== 'All' && (
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted font-medium">Payment Status</label>
                   <select className="border border-border rounded px-2 py-1.5 text-sm w-full" value={paymentFilter} onChange={e => setPaymentFilter(e.target.value)}>
                     <option value="All">All</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Unpaid">Unpaid</option>
+                    {typeFilter === 'Income' ? (
+                      <>
+                        <option value="Received">Received</option>
+                        <option value="Pending">Pending</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                      </>
+                    )}
                   </select>
                 </div>
               )}

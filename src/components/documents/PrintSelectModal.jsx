@@ -10,6 +10,10 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
 
   if (!isOpen) return null;
 
+  const INCOME_OPTIONS = [...INCOME_CATEGORIES, 'OTHER INCOME'];
+  const EXPENSE_OPTIONS = [...EXPENSE_CATEGORIES, 'OTHER EXPENSE'];
+  const REFRESHMENT_OPTIONS = [...REFRESHMENT_ITEMS, 'OTHER REFRESHMENT'];
+
   const handleToggle = (cat) => {
     if (selectedCategories.includes(cat)) {
       setSelectedCategories(selectedCategories.filter(c => c !== cat));
@@ -61,14 +65,14 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-extrabold text-sm text-primary tracking-widest uppercase">INCOME</h4>
               <button 
-                onClick={() => handleSelectAll(INCOME_CATEGORIES)}
+                onClick={() => handleSelectAll(INCOME_OPTIONS)}
                 className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full active:scale-95 transition-all"
               >
-                {isAllSelected(INCOME_CATEGORIES) ? 'Deselect All' : 'Select All'}
+                {isAllSelected(INCOME_OPTIONS) ? 'Deselect All' : 'Select All'}
               </button>
             </div>
             <div className="grid grid-cols-1 gap-1.5 bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
-              {INCOME_CATEGORIES.map(cat => (
+              {INCOME_OPTIONS.map(cat => (
                 <label key={cat} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white active:bg-white cursor-pointer transition-colors">
                   <input 
                     type="checkbox" 
@@ -87,14 +91,14 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-extrabold text-sm text-danger tracking-widest uppercase">EXPENSE</h4>
               <button 
-                onClick={() => handleSelectAll(EXPENSE_CATEGORIES)}
+                onClick={() => handleSelectAll(EXPENSE_OPTIONS)}
                 className="text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full active:scale-95 transition-all"
               >
-                {isAllSelected(EXPENSE_CATEGORIES) ? 'Deselect All' : 'Select All'}
+                {isAllSelected(EXPENSE_OPTIONS) ? 'Deselect All' : 'Select All'}
               </button>
             </div>
             <div className="grid grid-cols-1 gap-1.5 bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
-              {EXPENSE_CATEGORIES.map(cat => (
+              {EXPENSE_OPTIONS.map(cat => (
                 <label key={cat} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white active:bg-white cursor-pointer transition-colors">
                   <input 
                     type="checkbox" 
@@ -112,7 +116,7 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
           <div className="mb-8">
             <h4 className="font-extrabold text-sm text-warning tracking-widest uppercase mb-3">REFRESHMENT</h4>
             <div className="grid grid-cols-2 gap-2">
-              {REFRESHMENT_ITEMS.map(cat => (
+              {REFRESHMENT_OPTIONS.map(cat => (
                 <label key={cat} className="flex items-center gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100 cursor-pointer active:bg-white transition-colors">
                   <input 
                     type="checkbox" 

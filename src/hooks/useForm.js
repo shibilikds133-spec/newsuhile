@@ -20,6 +20,9 @@ export function useForm({ initialValues, validate, onSubmit }) {
     e.preventDefault();
     const validationErrors = validate ? validate(values) : {};
     if (Object.keys(validationErrors).length > 0) {
+      if (validationErrors.paymentStatus) {
+        import('react-hot-toast').then(toast => toast.default.error(validationErrors.paymentStatus));
+      }
       setErrors(validationErrors);
       return;
     }
