@@ -243,11 +243,11 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         y += 8;
 
         const detailCols = [
-          { label: 'Date', w: 25 },
-          { label: 'Type', w: 20 },
-          { label: 'Category', w: 35 },
-          { label: 'Description', w: 75 },
-          { label: 'Amount', w: 25, align: 'right' },
+          { label: 'Date', w: 16 },
+          { label: 'Type', w: 13 },
+          { label: 'Category', w: 30 },
+          { label: 'Description', w: 100 },
+          { label: 'Amount', w: 21, align: 'right' },
         ];
 
         doc.setFillColor(71, 85, 105); // slate-600
@@ -285,10 +285,10 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
           doc.setTextColor(30, 41, 59);
           cx += detailCols[1].w;
 
-          doc.text((t.category || t.item || '').substring(0, 18), cx + 2, y + 4.5);
+          doc.text((t.category || t.item || '').substring(0, 16), cx + 2, y + 4.5);
           cx += detailCols[2].w;
 
-          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 45), cx + 2, y + 4.5);
+          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 60), cx + 2, y + 4.5);
           cx += detailCols[3].w;
 
           doc.setFont('helvetica', 'bold');
