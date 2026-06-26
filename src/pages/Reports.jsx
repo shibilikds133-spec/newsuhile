@@ -7,6 +7,7 @@ import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths } from 'dat
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, REFRESHMENT_ITEMS } from '../constants/categories';
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
+import db from '../utils/db';
 
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
@@ -17,7 +18,7 @@ import PrintSelectModal from '../components/documents/PrintSelectModal';
 import SmartPrintPreview from '../components/documents/SmartPrintPreview';
 
 export default function Reports() {
-  const { allTransactions } = useTransactions();
+  const { allTransactions, fetchDateRangeFromServer } = useTransactions();
   
   const [typeFilter, setTypeFilter] = useState('All');
   const [paymentFilter, setPaymentFilter] = useState('All');
@@ -111,10 +112,24 @@ export default function Reports() {
     }
   ];
 
-  const handleGeneratePrintData = ({ categories, paymentStatus, fromDate: printFrom, toDate: printTo }) => {
+  const handleGeneratePrintData = async ({ categories, paymentStatus, fromDate: printFrom, toDate: printTo }) => {
     setIsPrintModalOpen(false);
 
-    const dataToPrint = allTransactions.filter(t => {
+    if (printFrom && printTo) {
+      toast.loading('Checking and fetching report data...', { id: 'fetch-reports' });
+      await fetchDateRangeFromServer(printFrom, printTo);
+      toast.dismiss('fetch-reports');
+    }
+
+    const [inc, exp, ref] = await Promise.all([
+      db.income.filter(r => !r.is_deleted).toArray(),
+      db.expenses.filter(r => !r.is_deleted).toArray(),
+      db.refreshments.filter(r => !r.is_deleted).toArray(),
+    ]);
+
+    const latestTransactions = [...inc, ...exp, ...ref];
+
+    const dataToPrint = latestTransactions.filter(t => {
       if (printFrom && t.date < printFrom) return false;
       if (printTo && t.date > printTo) return false;
       const cat = t.category || t.item;
@@ -135,6 +150,9 @@ export default function Reports() {
     if (dataToPrint.length === 0) {
       return toast.error('No records found for selected criteria');
     }
+
+    // Sort descending
+    dataToPrint.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     setPrintPreviewFilters({ fromDate: printFrom, toDate: printTo, paymentStatus, categories });
     setPrintPreviewData(dataToPrint);
@@ -248,14 +266,41 @@ export default function Reports() {
                 { key: 'status', label: 'Status' }
               ], `full-report-${todayISO()}.xlsx`);
             }}>Excel</Button>
-            <Button variant="primary" onClick={() => {
+            <Button variant="primary" onClick={async () => {
+              if (fromDate && toDate) {
+                toast.loading('Checking and fetching report data...', { id: 'fetch-reports' });
+                await fetchDateRangeFromServer(fromDate, toDate);
+                toast.dismiss('fetch-reports');
+              }
+
+              const [inc, exp, ref] = await Promise.all([
+                db.income.filter(r => !r.is_deleted).toArray(),
+                db.expenses.filter(r => !r.is_deleted).toArray(),
+                db.refreshments.filter(r => !r.is_deleted).toArray(),
+              ]);
+
+              const latestTransactions = [...inc, ...exp, ...ref];
+
+              const latestData = latestTransactions.filter(t => {
+                if (expenseCategoryFilter !== 'All' && (t.category || t.item) !== expenseCategoryFilter) return false;
+                if (paymentFilter !== 'All') {
+                  const status = t.paymentStatus || (t.type === 'income' ? 'Received' : 'Paid');
+                  if (status !== paymentFilter) return false;
+                }
+                if (fromDate && t.date < fromDate) return false;
+                if (toDate && t.date > toDate) return false;
+                return true;
+              });
+
+              latestData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
               setPrintPreviewFilters({ 
                 fromDate, 
                 toDate, 
                 paymentStatus: paymentFilter, 
                 categories: expenseCategoryFilter === 'All' ? [] : [expenseCategoryFilter] 
               });
-              setPrintPreviewData(filteredData);
+              setPrintPreviewData(latestData);
             }}>Print Report</Button>
           </div>
         </div>

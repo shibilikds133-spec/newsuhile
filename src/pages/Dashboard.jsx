@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
 import { formatINR, formatDate } from '../utils/formatters';
 import Card from '../components/ui/Card';
@@ -17,11 +17,21 @@ export default function Dashboard() {
     totalIncome: overallIncome,
     totalExpense: overallExpense,
     totalUnpaid: overallUnpaid,
-    netBalance: overallNetBalance 
+    netBalance: overallNetBalance,
+    fetchDateRangeFromServer
   } = useTransactions();
   
   const [selectedMonth, setSelectedMonth] = useState(format(subMonths(new Date(), 1), 'yyyy-MM'));
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' | 'overall'
+
+  // Auto-fetch data for whichever month the user selects
+  useEffect(() => {
+    if (!selectedMonth) return;
+    const [y, mo] = selectedMonth.split('-');
+    const monthStart = `${y}-${mo}-01`;
+    const monthEnd = new Date(parseInt(y), parseInt(mo), 0).toISOString().split('T')[0];
+    fetchDateRangeFromServer(monthStart, monthEnd);
+  }, [selectedMonth]); // fetchDateRangeFromServer is a stable closure
 
   // Filter by selected month for the monthly view
   const filteredTransactions = useMemo(() => {

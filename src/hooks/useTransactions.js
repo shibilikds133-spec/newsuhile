@@ -37,26 +37,82 @@ export function useTransactions() {
   useEffect(() => {
     let isMounted = true;
     const fetchRemoteData = async () => {
+      // CRIT-2 fix upgraded: If full hydration is not explicitly marked as complete,
+      // useSync.checkAndHydrate() is handling (or will handle) the full-history pull.
+      // Skip normal startup sync to prevent a parallel race.
+      const hydrationState = localStorage.getItem('dawa_hydration_state') || 'idle';
+      if (hydrationState !== 'complete') {
+        setLoading(false);
+        return;
+      }
+
       // Don't set loading to true if we already have some local data to show
       const hasLocalData = rawIncome.length > 0 || rawExpenses.length > 0 || rawRefreshments.length > 0;
       if (!hasLocalData) setLoading(true);
       
       setGlobalSyncStatus('syncing');
       try {
-        const { data: incomeData, error: incomeError } = await supabase.from('income').select('*');
-        const { data: expenseData, error: expenseError } = await supabase.from('expenses').select('*');
-        const { data: refreshData, error: refreshError } = await supabase.from('refreshments').select('*');
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1; // 1-indexed
 
-        if (incomeError || expenseError || refreshError) {
+        // Include last month so Dashboard's default "last month" view has data
+        const lastMonthDate = new Date(y, m - 2, 1);
+        const lastMonthStart = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}-01`;
+        const monthEnd = new Date(y, m, 0).toISOString().split('T')[0];
+
+        const [incRes, expRes, refRes] = await Promise.all([
+          supabase.from('income').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
+          supabase.from('expenses').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
+          supabase.from('refreshments').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
+        ]);
+
+        if (incRes.error || expRes.error || refRes.error) {
           throw new Error('Failed to fetch data from Supabase');
         }
 
-        // Merge remote data into local keeping local 'pending' items safe
-        await db.transaction('rw', db.income, db.expenses, db.refreshments, async () => {
-          if (incomeData) await db.income.bulkPut(incomeData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Received', synced: true, sync_status: 'synced' })));
-          if (expenseData) await db.expenses.bulkPut(expenseData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Paid', synced: true, sync_status: 'synced' })));
-          if (refreshData) await db.refreshments.bulkPut(refreshData.map(r => ({ ...r, paymentStatus: r.paymentStatus || 'Paid', synced: true, sync_status: 'synced' })));
+        // Safe merge remote data into local keeping local 'pending' items safe
+        const safeMerge = async (tableName, serverData, defaultStatus) => {
+          if (!serverData || serverData.length === 0) return;
+          await db.transaction('rw', db[tableName], async () => {
+            const pending = await db[tableName]
+              .filter(r => r.sync_status === 'pending' || r.synced === false)
+              .toArray();
+            const pendingIds = new Set(pending.map(r => r.id));
+
+            const toPut = serverData
+              .filter(r => !pendingIds.has(r.id))
+              .map(r => ({
+                ...r,
+                paymentStatus: r.paymentStatus || defaultStatus,
+                synced: true,
+                sync_status: 'synced',
+              }));
+
+            if (toPut.length > 0) {
+              await db[tableName].bulkPut(toPut);
+            }
+          });
+        };
+
+        await safeMerge('income', incRes.data, 'Received');
+        await safeMerge('expenses', expRes.data, 'Paid');
+        await safeMerge('refreshments', refRes.data, 'Paid');
+
+        // Mark both last month and current month as loaded in cache
+        const currentMonthStr = `${y}-${String(m).padStart(2, '0')}`;
+        const lastMonthStr = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
+        const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
+        let loadedMonths = [];
+        try {
+          loadedMonths = JSON.parse(loadedMonthsStr);
+        } catch (e) {
+          loadedMonths = [];
+        }
+        [currentMonthStr, lastMonthStr].forEach(ms => {
+          if (!loadedMonths.includes(ms)) loadedMonths.push(ms);
         });
+        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
 
         if (isMounted) setGlobalSyncStatus('synced');
       } catch (error) {
@@ -198,6 +254,101 @@ export function useTransactions() {
     };
   }, [income, expenses, refreshments]);
 
+  const fetchDateRangeFromServer = async (fromDate, toDate) => {
+    if (!navigator.onLine) return;
+    if (!fromDate || !toDate) return;
+
+    try {
+      setGlobalSyncStatus('syncing');
+      
+      const start = new Date(fromDate);
+      const end = new Date(toDate);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+
+      // 1. Calculate months spanned
+      const months = [];
+      let current = new Date(start.getFullYear(), start.getMonth(), 1);
+      const limit = new Date(end.getFullYear(), end.getMonth(), 1);
+      while (current <= limit) {
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        months.push(`${y}-${m}`);
+        current.setMonth(current.getMonth() + 1);
+      }
+
+      // 2. Filter loaded months
+      const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
+      let loadedMonths = [];
+      try {
+        loadedMonths = JSON.parse(loadedMonthsStr);
+      } catch (err) {
+        loadedMonths = [];
+      }
+
+      const missingMonths = months.filter(m => !loadedMonths.includes(m));
+      if (missingMonths.length === 0) {
+        setGlobalSyncStatus('synced');
+        return;
+      }
+
+      // 3. Fetch missing months in batches
+      for (const monthStr of missingMonths) {
+        const [yStr, mStr] = monthStr.split('-');
+        const y = parseInt(yStr, 10);
+        const m = parseInt(mStr, 10);
+
+        const monthStart = `${yStr}-${mStr}-01`;
+        const monthEnd = new Date(y, m, 0).toISOString().split('T')[0];
+
+        const [incRes, expRes, refRes] = await Promise.all([
+          supabase.from('income').select('*').gte('date', monthStart).lte('date', monthEnd),
+          supabase.from('expenses').select('*').gte('date', monthStart).lte('date', monthEnd),
+          supabase.from('refreshments').select('*').gte('date', monthStart).lte('date', monthEnd),
+        ]);
+
+        if (incRes.error) throw incRes.error;
+        if (expRes.error) throw expRes.error;
+        if (refRes.error) throw refRes.error;
+
+        // 4. Safe merge into local Dexie
+        const safeMerge = async (tableName, serverData, defaultStatus) => {
+          if (!serverData || serverData.length === 0) return;
+          await db.transaction('rw', db[tableName], async () => {
+            const pending = await db[tableName]
+              .filter(r => r.sync_status === 'pending' || r.synced === false)
+              .toArray();
+            const pendingIds = new Set(pending.map(r => r.id));
+
+            const toPut = serverData
+              .filter(r => !pendingIds.has(r.id))
+              .map(r => ({
+                ...r,
+                paymentStatus: r.paymentStatus || defaultStatus,
+                synced: true,
+                sync_status: 'synced',
+              }));
+
+            if (toPut.length > 0) {
+              await db[tableName].bulkPut(toPut);
+            }
+          });
+        };
+
+        await safeMerge('income', incRes.data, 'Received');
+        await safeMerge('expenses', expRes.data, 'Paid');
+        await safeMerge('refreshments', refRes.data, 'Paid');
+
+        loadedMonths.push(monthStr);
+        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
+      }
+
+      setGlobalSyncStatus('synced');
+    } catch (e) {
+      console.error('[fetchDateRangeFromServer] error:', e);
+      setGlobalSyncStatus('error');
+    }
+  };
+
   return {
     income,
     expenses,
@@ -211,6 +362,7 @@ export function useTransactions() {
     deleteRecord,
     updatePaymentStatus,
     allTransactions,
+    fetchDateRangeFromServer,
     ...stats,
   };
 }

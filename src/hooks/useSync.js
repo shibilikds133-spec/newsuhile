@@ -45,10 +45,10 @@ export function useSync() {
     // -----------------------------------------------------------------------
     const checkAndHydrate = async () => {
       try {
-        const incomeCount = await db.income.count();
-        if (incomeCount === 0 && navigator.onLine) {
-          console.log('Database empty on first boot. Pulling data from cloud...');
-          await pullFromCloud();
+        const hydrationState = localStorage.getItem('dawa_hydration_state') || 'idle';
+        if (hydrationState !== 'complete' && navigator.onLine) {
+          console.log(`[Hydration] State is '${hydrationState}'. Pulling FULL HISTORY from cloud...`);
+          await pullFromCloud(true); // fresh install — no date cap
         }
       } catch (error) {
         console.error('Hydration check failed:', error);
@@ -98,35 +98,120 @@ export function useSync() {
   // -------------------------------------------------------------------------
   // pullFromCloud — full pull from Supabase → local IndexedDB
   // -------------------------------------------------------------------------
-  const pullFromCloud = async () => {
+  const pullFromCloud = async (fullHistory = false) => {
     try {
       if (!navigator.onLine) return;
 
+      if (fullHistory) {
+        localStorage.setItem('dawa_hydration_state', 'running');
+      }
       setSyncStatus('syncing');
 
-      const [incRes, expRes, refRes] = await Promise.all([
-        supabase.from('income').select('*'),
-        supabase.from('expenses').select('*'),
-        supabase.from('refreshments').select('*')
-      ]);
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
 
-      if (incRes.error) throw incRes.error;
-      if (expRes.error) throw expRes.error;
-      if (refRes.error) throw refRes.error;
+      // -----------------------------------------------------------------------
+      // CRIT-1 fix: paginated helper — fetches ALL rows even when table > 1000
+      // Supabase/PostgREST silently caps a plain select('*') at 1000 rows.
+      // This loop continues until a page returns fewer rows than PAGE_SIZE.
+      // -----------------------------------------------------------------------
+      const fetchAllRows = async (tableName) => {
+        const PAGE_SIZE = 1000;
+        let allData = [];
+        let from = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from(tableName)
+            .select('*')
+            .range(from, from + PAGE_SIZE - 1);
+          if (error) throw error;
+          allData = [...allData, ...(data || [])];
+          if (!data || data.length < PAGE_SIZE) break; // last page reached
+          from += PAGE_SIZE;
+        }
+        return allData;
+      };
 
-      // Mark downloaded records as already synced
-      const markSynced = (data) =>
-        data?.map(item => ({ ...item, synced: true, sync_status: 'synced' })) || [];
+      let incData, expData, refData;
 
-      await db.transaction('rw', db.income, db.expenses, db.refreshments, async () => {
-        if (incRes.data?.length > 0) await db.income.bulkPut(markSynced(incRes.data));
-        if (expRes.data?.length > 0) await db.expenses.bulkPut(markSynced(expRes.data));
-        if (refRes.data?.length > 0) await db.refreshments.bulkPut(markSynced(refRes.data));
-      });
+      if (fullHistory) {
+        // Fresh install: paginated fetch — guaranteed no row cap
+        [incData, expData, refData] = await Promise.all([
+          fetchAllRows('income'),
+          fetchAllRows('expenses'),
+          fetchAllRows('refreshments'),
+        ]);
+      } else {
+        // Normal sync: single-page current-month fetch (always < 1000 rows)
+        const monthStart = `${y}-${m}-01`;
+        const monthEnd = new Date(y, now.getMonth() + 1, 0).toISOString().split('T')[0];
+        const [incRes, expRes, refRes] = await Promise.all([
+          supabase.from('income').select('*').gte('date', monthStart).lte('date', monthEnd),
+          supabase.from('expenses').select('*').gte('date', monthStart).lte('date', monthEnd),
+          supabase.from('refreshments').select('*').gte('date', monthStart).lte('date', monthEnd),
+        ]);
+        if (incRes.error) throw incRes.error;
+        if (expRes.error) throw expRes.error;
+        if (refRes.error) throw refRes.error;
+        incData = incRes.data;
+        expData = expRes.data;
+        refData = refRes.data;
+      }
+
+      const safeMerge = async (tableName, serverData, defaultStatus) => {
+        if (!serverData || serverData.length === 0) return;
+        await db.transaction('rw', db[tableName], async () => {
+          const pending = await db[tableName]
+            .filter(r => r.sync_status === 'pending' || r.synced === false)
+            .toArray();
+          const pendingIds = new Set(pending.map(r => r.id));
+
+          const toPut = serverData
+            .filter(r => !pendingIds.has(r.id))
+            .map(r => ({
+              ...r,
+              paymentStatus: r.paymentStatus || defaultStatus,
+              synced: true,
+              sync_status: 'synced',
+            }));
+
+          if (toPut.length > 0) {
+            await db[tableName].bulkPut(toPut);
+          }
+        });
+      };
+
+      await safeMerge('income', incData, 'Received');
+      await safeMerge('expenses', expData, 'Paid');
+      await safeMerge('refreshments', refData, 'Paid');
+
+      if (fullHistory) {
+        // Full-history hydration complete
+        localStorage.setItem('dawa_hydration_state', 'complete');
+        console.log('[Hydration] Full history pulled and stored in Dexie.');
+      } else {
+        // Add this current month to dawa_loaded_months cache
+        const monthStr = `${y}-${m}`;
+        const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
+        let loadedMonths = [];
+        try {
+          loadedMonths = JSON.parse(loadedMonthsStr);
+        } catch (e) {
+          loadedMonths = [];
+        }
+        if (!loadedMonths.includes(monthStr)) {
+          loadedMonths.push(monthStr);
+          localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
+        }
+      }
 
       setSyncStatus('synced');
-      console.log('Successfully pulled all data from cloud');
+      console.log('[Sync] Pull from cloud complete.');
     } catch (e) {
+      if (fullHistory) {
+        localStorage.setItem('dawa_hydration_state', 'failed');
+      }
       console.error('Failed to pull from cloud:', e);
       setSyncStatus('error');
     }
