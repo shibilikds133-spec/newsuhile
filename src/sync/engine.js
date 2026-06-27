@@ -7,8 +7,9 @@
  *   • logSync()             — write a sync attempt to the local sync_log table
  *
  * Design notes:
- *   - Records are never fully deleted while offline. Soft-delete (is_deleted=true)
- *     is used instead, so the delete reaches the cloud once connectivity returns.
+ *   - Full Soft Delete architecture: records with is_deleted=true are upserted
+ *     to Supabase (tombstone), never physically deleted from cloud.
+ *   - Other devices detect the tombstone on next pull and remove locally.
  *   - cloud upsert uses onConflict:'id' to prevent duplicate rows.
  */
 
@@ -47,19 +48,42 @@ async function syncTable(tableName) {
   const toDelete = pending.filter((r) => r.is_deleted === true);
   const toUpsert = pending.filter((r) => r.is_deleted !== true);
 
-  // --- Handle soft-deleted records ---
-  for (const record of toDelete) {
-    try {
-      const { error } = await supabase.from(tableName).delete().eq('id', record.id);
-      if (error) throw error;
+  // --- Handle soft-deleted records (Full Soft Delete) ---
+  // Tombstone records are upserted to cloud with is_deleted=true.
+  // They are NOT physically deleted from Supabase.
+  // Other devices will detect is_deleted=true on next pull and remove locally.
+  if (toDelete.length > 0) {
+    const tombstones = toDelete.map(({ sync_status, synced, ...rest }) => ({
+      ...rest,
+      is_deleted: true,
+    }));
 
-      // After successful cloud delete, remove locally too
-      await db[tableName].delete(record.id);
-      await logSync({ record_id: record.id, table_name: tableName, status: 'deleted' });
-    } catch (e) {
-      console.warn(`[SyncEngine] Failed to delete ${tableName}:${record.id}`, e);
-      await db[tableName].update(record.id, { sync_status: 'failed' });
-      await logSync({ record_id: record.id, table_name: tableName, status: 'failed', error_msg: e.message });
+    const { error: delError } = await supabase
+      .from(tableName)
+      .upsert(tombstones, { onConflict: 'id' });
+
+    if (delError) {
+      // Mark all tombstones as failed so retry picks them up
+      await Promise.all(
+        toDelete.map((r) =>
+          db[tableName]
+            .update(r.id, { sync_status: 'failed' })
+            .then(() =>
+              logSync({ record_id: r.id, table_name: tableName, status: 'failed', error_msg: delError.message })
+            )
+        )
+      );
+    } else {
+      // Mark tombstones as synced — retain locally as tombstone, do NOT purge
+      await Promise.all(
+        toDelete.map((r) =>
+          db[tableName]
+            .update(r.id, { sync_status: 'synced', synced: true })
+            .then(() =>
+              logSync({ record_id: r.id, table_name: tableName, status: 'deleted' })
+            )
+        )
+      );
     }
   }
 

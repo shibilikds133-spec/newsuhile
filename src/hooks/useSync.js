@@ -167,8 +167,18 @@ export function useSync() {
             .toArray();
           const pendingIds = new Set(pending.map(r => r.id));
 
+          // --- Soft Delete propagation: remove tombstones locally ---
+          // Only remove if NOT pending locally (pending = unsynced local change)
+          const tombstones = serverData.filter(
+            r => r.is_deleted === true && !pendingIds.has(r.id)
+          );
+          for (const r of tombstones) {
+            await db[tableName].delete(r.id);
+          }
+
+          // --- Merge active records only ---
           const toPut = serverData
-            .filter(r => !pendingIds.has(r.id))
+            .filter(r => r.is_deleted !== true && !pendingIds.has(r.id))
             .map(r => ({
               ...r,
               paymentStatus: r.paymentStatus || defaultStatus,

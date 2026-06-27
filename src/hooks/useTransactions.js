@@ -80,8 +80,18 @@ export function useTransactions() {
               .toArray();
             const pendingIds = new Set(pending.map(r => r.id));
 
+            // --- Soft Delete propagation: remove tombstones locally ---
+            // Only remove if NOT pending locally (pending = unsynced local change)
+            const tombstones = serverData.filter(
+              r => r.is_deleted === true && !pendingIds.has(r.id)
+            );
+            for (const r of tombstones) {
+              await db[tableName].delete(r.id);
+            }
+
+            // --- Merge active records only ---
             const toPut = serverData
-              .filter(r => !pendingIds.has(r.id))
+              .filter(r => r.is_deleted !== true && !pendingIds.has(r.id))
               .map(r => ({
                 ...r,
                 paymentStatus: r.paymentStatus || defaultStatus,
@@ -177,20 +187,28 @@ export function useTransactions() {
 
   const deleteRecord = async (id, type) => {
     const tableName = type === 'income' ? 'income' : type === 'expense' ? 'expenses' : 'refreshments';
+    // Step 1: Mark locally as tombstone + pending (works offline too)
     await db[tableName].update(id, { is_deleted: true, synced: false, sync_status: 'pending' });
 
     setGlobalSyncStatus('syncing');
     try {
       if (!navigator.onLine) {
+        // Offline: tombstone stays pending. engine.js will upsert it when back online.
         setGlobalSyncStatus('error');
         return;
       }
-      const { error } = await supabase.from(tableName).delete().eq('id', id);
+      // Step 2: Soft delete on cloud — upsert tombstone, NOT physical delete
+      const { error } = await supabase
+        .from(tableName)
+        .update({ is_deleted: true })
+        .eq('id', id);
       if (error) throw error;
-      await db[tableName].delete(id);
+      // Step 3: Mark local tombstone as synced — retain in Dexie, do NOT purge
+      await db[tableName].update(id, { sync_status: 'synced', synced: true });
       setGlobalSyncStatus('synced');
     } catch (e) {
-      console.warn('Could not delete from cloud — soft-delete retained for later sync.', e);
+      console.warn('Could not delete from cloud — soft-delete tombstone retained for later sync.', e);
+      // sync_status stays 'pending' so engine.js retries on next cycle
       setGlobalSyncStatus('error');
     }
   };
@@ -319,8 +337,18 @@ export function useTransactions() {
               .toArray();
             const pendingIds = new Set(pending.map(r => r.id));
 
+            // --- Soft Delete propagation: remove tombstones locally ---
+            // Only remove if NOT pending locally (pending = unsynced local change)
+            const tombstones = serverData.filter(
+              r => r.is_deleted === true && !pendingIds.has(r.id)
+            );
+            for (const r of tombstones) {
+              await db[tableName].delete(r.id);
+            }
+
+            // --- Merge active records only ---
             const toPut = serverData
-              .filter(r => !pendingIds.has(r.id))
+              .filter(r => r.is_deleted !== true && !pendingIds.has(r.id))
               .map(r => ({
                 ...r,
                 paymentStatus: r.paymentStatus || defaultStatus,
