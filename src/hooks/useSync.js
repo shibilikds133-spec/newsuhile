@@ -17,6 +17,9 @@ export function useSync() {
     const handleOnline = async () => {
       setSyncStatus('syncing');
       try {
+        // Retry previously failed records first, then push any pending ones.
+        // This ensures phone-created records stuck in 'failed' sync on reconnect.
+        await retryFailedRecords();
         await syncPendingRecords();
         setSyncStatus('synced');
         toast.success('Offline records synced to cloud!');
@@ -32,6 +35,9 @@ export function useSync() {
     const intervalId = setInterval(async () => {
       if (!navigator.onLine) return;
       try {
+        // Retry failed records before processing new pending ones.
+        // Ensures records stuck in 'failed' (e.g. after network blip) are recovered.
+        await retryFailedRecords();
         await syncPendingRecords();
         setSyncStatus('synced');
       } catch (e) {
