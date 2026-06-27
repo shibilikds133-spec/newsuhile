@@ -207,19 +207,30 @@ export function useSync() {
         localStorage.setItem('dawa_hydration_state', 'complete');
         console.log('[Hydration] Full history pulled and stored in Dexie.');
       } else {
-        // Add this current month to dawa_loaded_months cache
         const monthStr = `${y}-${m}`;
         const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
         let loadedMonths = [];
         try {
           loadedMonths = JSON.parse(loadedMonthsStr);
+          if (!Array.isArray(loadedMonths)) loadedMonths = [];
         } catch (e) {
           loadedMonths = [];
         }
-        if (!loadedMonths.includes(monthStr)) {
-          loadedMonths.push(monthStr);
-          localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
+        
+        const existingIndex = loadedMonths.findIndex(m => {
+          if (typeof m === 'string') return m === monthStr;
+          return m && m.month === monthStr;
+        });
+
+        const newEntry = { month: monthStr, fetchedAt: Date.now() };
+
+        if (existingIndex >= 0) {
+          loadedMonths[existingIndex] = newEntry;
+        } else {
+          loadedMonths.push(newEntry);
         }
+        
+        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
       }
 
       setSyncStatus('synced');

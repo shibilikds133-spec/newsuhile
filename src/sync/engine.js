@@ -44,6 +44,16 @@ async function syncTable(tableName) {
 
   if (pending.length === 0) return;
 
+  const hasMutated = (oldRec, newRec) => {
+    if (!newRec) return true;
+    const keys = new Set([...Object.keys(oldRec), ...Object.keys(newRec)]);
+    for (const k of keys) {
+      if (k === 'sync_status' || k === 'synced') continue;
+      if (oldRec[k] !== newRec[k]) return true;
+    }
+    return false;
+  };
+
   // Separate soft-deleted vs normal upserts
   const toDelete = pending.filter((r) => r.is_deleted === true);
   const toUpsert = pending.filter((r) => r.is_deleted !== true);
@@ -76,13 +86,15 @@ async function syncTable(tableName) {
     } else {
       // Mark tombstones as synced — retain locally as tombstone, do NOT purge
       await Promise.all(
-        toDelete.map((r) =>
-          db[tableName]
-            .update(r.id, { sync_status: 'synced', synced: true })
-            .then(() =>
-              logSync({ record_id: r.id, table_name: tableName, status: 'deleted' })
-            )
-        )
+        toDelete.map(async (r) => {
+          const current = await db[tableName].get(r.id);
+          if (!hasMutated(r, current)) {
+            await db[tableName].update(r.id, { sync_status: 'synced', synced: true });
+            await logSync({ record_id: r.id, table_name: tableName, status: 'deleted' });
+          } else {
+            console.warn(`[SyncEngine] Record ${r.id} mutated during delete sync. Leaving as pending.`);
+          }
+        })
       );
     }
   }
@@ -111,11 +123,15 @@ async function syncTable(tableName) {
 
   // Mark all as synced
   await Promise.all(
-    toUpsert.map((r) =>
-      db[tableName].update(r.id, { sync_status: 'synced', synced: true }).then(() =>
-        logSync({ record_id: r.id, table_name: tableName, status: 'synced' })
-      )
-    )
+    toUpsert.map(async (r) => {
+      const current = await db[tableName].get(r.id);
+      if (!hasMutated(r, current)) {
+        await db[tableName].update(r.id, { sync_status: 'synced', synced: true });
+        await logSync({ record_id: r.id, table_name: tableName, status: 'synced' });
+      } else {
+        console.warn(`[SyncEngine] Record ${r.id} mutated during upsert sync. Leaving as pending.`);
+      }
+    })
   );
 }
 

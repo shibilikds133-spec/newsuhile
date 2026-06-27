@@ -12,6 +12,57 @@ const setGlobalSyncStatus = (status) => {
   syncListeners.forEach(l => l(status));
 };
 
+// --- TTL Cache Helpers ---
+const CACHE_KEY = 'dawa_loaded_months';
+const CACHE_TTL_MS = 300000; // 5 minutes
+
+const getLoadedMonths = () => {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY) || '[]';
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    
+    // Auto-migrate old string array to object array with fetchedAt: 0
+    return parsed.map(item => {
+      if (typeof item === 'string') {
+        return { month: item, fetchedAt: 0 };
+      }
+      return item;
+    });
+  } catch (e) {
+    console.warn('Failed to parse loaded months cache, resetting.', e);
+    return [];
+  }
+};
+
+const isMonthCacheValid = (monthStr) => {
+  const loaded = getLoadedMonths();
+  const entry = loaded.find(m => m.month === monthStr);
+  if (!entry) return false;
+  
+  const age = Date.now() - (entry.fetchedAt || 0);
+  return age < CACHE_TTL_MS;
+};
+
+const markMonthFetched = (monthStr) => {
+  try {
+    const loaded = getLoadedMonths();
+    const existingIndex = loaded.findIndex(m => m.month === monthStr);
+    const newEntry = { month: monthStr, fetchedAt: Date.now() };
+    
+    if (existingIndex >= 0) {
+      loaded[existingIndex] = newEntry;
+    } else {
+      loaded.push(newEntry);
+    }
+    
+    localStorage.setItem(CACHE_KEY, JSON.stringify(loaded));
+  } catch (e) {
+    console.warn('Failed to update month cache', e);
+  }
+};
+// ------------------------
+
 export function useTransactions() {
   const [syncStatus, setSyncStatus] = useState(globalSyncStatus);
   // Change default loading to false to avoid blocking UI if local data exists
@@ -112,17 +163,8 @@ export function useTransactions() {
         // Mark both last month and current month as loaded in cache
         const currentMonthStr = `${y}-${String(m).padStart(2, '0')}`;
         const lastMonthStr = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
-        const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
-        let loadedMonths = [];
-        try {
-          loadedMonths = JSON.parse(loadedMonthsStr);
-        } catch (e) {
-          loadedMonths = [];
-        }
-        [currentMonthStr, lastMonthStr].forEach(ms => {
-          if (!loadedMonths.includes(ms)) loadedMonths.push(ms);
-        });
-        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
+        markMonthFetched(currentMonthStr);
+        markMonthFetched(lastMonthStr);
 
         if (isMounted) setGlobalSyncStatus('synced');
       } catch (error) {
@@ -167,26 +209,48 @@ export function useTransactions() {
     }
   };
 
+  const invalidateMonthCache = (dateString) => {
+    if (!dateString) return;
+    try {
+      const monthKey = dateString.substring(0, 7); // "2026-03-15" -> "2026-03"
+      const loaded = getLoadedMonths();
+      const updated = loaded.filter(m => m.month !== monthKey);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to invalidate month cache', e);
+    }
+  };
+
   const addIncome = async (record) => {
     const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Received', synced: false, sync_status: 'pending' };
     await db.income.put(newRecord);
+    invalidateMonthCache(record.date);
     await pushToCloud('income', newRecord);
   };
 
   const addExpense = async (record) => {
     const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Paid', synced: false, sync_status: 'pending' };
     await db.expenses.put(newRecord);
+    invalidateMonthCache(record.date);
     await pushToCloud('expenses', newRecord);
   };
 
   const addRefreshment = async (record) => {
     const newRecord = { ...record, paymentStatus: record.paymentStatus || 'Paid', synced: false, sync_status: 'pending' };
     await db.refreshments.put(newRecord);
+    invalidateMonthCache(record.date);
     await pushToCloud('refreshments', newRecord);
   };
 
   const deleteRecord = async (id, type) => {
     const tableName = type === 'income' ? 'income' : type === 'expense' ? 'expenses' : 'refreshments';
+    
+    // Invalidate cache for this record's month before marking it deleted
+    const record = await db[tableName].get(id);
+    if (record && record.date) {
+      invalidateMonthCache(record.date);
+    }
+
     // Step 1: Mark locally as tombstone + pending (works offline too)
     await db[tableName].update(id, { is_deleted: true, synced: false, sync_status: 'pending' });
 
@@ -198,11 +262,13 @@ export function useTransactions() {
         return;
       }
       // Step 2: Soft delete on cloud — upsert tombstone, NOT physical delete
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from(tableName)
         .update({ is_deleted: true })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('0 rows affected (record pending)');
       // Step 3: Mark local tombstone as synced — retain in Dexie, do NOT purge
       await db[tableName].update(id, { sync_status: 'synced', synced: true });
       setGlobalSyncStatus('synced');
@@ -218,6 +284,10 @@ export function useTransactions() {
     const record = await db[tableName].get(id);
     if (!record) return;
     
+    if (record.date) {
+      invalidateMonthCache(record.date);
+    }
+    
     // Toggle logic based on type
     let newStatus = 'Paid';
     if (type === 'income') {
@@ -231,8 +301,13 @@ export function useTransactions() {
     setGlobalSyncStatus('syncing');
     try {
       if (!navigator.onLine) throw new Error('Offline');
-      const { error } = await supabase.from(tableName).update({ paymentStatus: newStatus }).eq('id', id);
+      const { data, error } = await supabase
+        .from(tableName)
+        .update({ paymentStatus: newStatus })
+        .eq('id', id)
+        .select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('0 rows affected (record pending)');
       await db[tableName].update(id, { synced: true, sync_status: 'synced' });
       setGlobalSyncStatus('synced');
     } catch (error) {
@@ -294,16 +369,8 @@ export function useTransactions() {
         current.setMonth(current.getMonth() + 1);
       }
 
-      // 2. Filter loaded months
-      const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
-      let loadedMonths = [];
-      try {
-        loadedMonths = JSON.parse(loadedMonthsStr);
-      } catch (err) {
-        loadedMonths = [];
-      }
-
-      const missingMonths = months.filter(m => !loadedMonths.includes(m));
+      // 2. Filter loaded months based on TTL
+      const missingMonths = months.filter(m => !isMonthCacheValid(m));
       if (missingMonths.length === 0) {
         setGlobalSyncStatus('synced');
         return;
@@ -366,8 +433,7 @@ export function useTransactions() {
         await safeMerge('expenses', expRes.data, 'Paid');
         await safeMerge('refreshments', refRes.data, 'Paid');
 
-        loadedMonths.push(monthStr);
-        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
+        markMonthFetched(monthStr);
       }
 
       setGlobalSyncStatus('synced');
