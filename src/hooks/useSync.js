@@ -21,6 +21,7 @@ export function useSync() {
         // This ensures phone-created records stuck in 'failed' sync on reconnect.
         await retryFailedRecords();
         await syncPendingRecords();
+        await pullFromCloud();
         setSyncStatus('synced');
         toast.success('Offline records synced to cloud!');
       } catch (e) {
@@ -39,6 +40,7 @@ export function useSync() {
         // Ensures records stuck in 'failed' (e.g. after network blip) are recovered.
         await retryFailedRecords();
         await syncPendingRecords();
+        await pullFromCloud();
         setSyncStatus('synced');
       } catch (e) {
         console.warn('[useSync] Interval sync error:', e);
@@ -113,16 +115,7 @@ export function useSync() {
       }
       setSyncStatus('syncing');
 
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-
-      // -----------------------------------------------------------------------
-      // CRIT-1 fix: paginated helper — fetches ALL rows even when table > 1000
-      // Supabase/PostgREST silently caps a plain select('*') at 1000 rows.
-      // This loop continues until a page returns fewer rows than PAGE_SIZE.
-      // -----------------------------------------------------------------------
-      const fetchAllRows = async (tableName) => {
+      const fetchAllRows = async (tableName, cursor = '1970-01-01T00:00:00.000Z') => {
         const PAGE_SIZE = 1000;
         let allData = [];
         let from = 0;
@@ -130,6 +123,8 @@ export function useSync() {
           const { data, error } = await supabase
             .from(tableName)
             .select('*')
+            .gt('updated_at', cursor)
+            .order('updated_at', { ascending: true })
             .range(from, from + PAGE_SIZE - 1);
           if (error) throw error;
           allData = [...allData, ...(data || [])];
@@ -140,30 +135,15 @@ export function useSync() {
       };
 
       let incData, expData, refData;
+      
+      const lastCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
+      const fetchCursor = fullHistory ? '1970-01-01T00:00:00.000Z' : lastCursor;
 
-      if (fullHistory) {
-        // Fresh install: paginated fetch — guaranteed no row cap
-        [incData, expData, refData] = await Promise.all([
-          fetchAllRows('income'),
-          fetchAllRows('expenses'),
-          fetchAllRows('refreshments'),
-        ]);
-      } else {
-        // Normal sync: single-page current-month fetch (always < 1000 rows)
-        const monthStart = `${y}-${m}-01`;
-        const monthEnd = new Date(y, now.getMonth() + 1, 0).toISOString().split('T')[0];
-        const [incRes, expRes, refRes] = await Promise.all([
-          supabase.from('income').select('*').gte('date', monthStart).lte('date', monthEnd),
-          supabase.from('expenses').select('*').gte('date', monthStart).lte('date', monthEnd),
-          supabase.from('refreshments').select('*').gte('date', monthStart).lte('date', monthEnd),
-        ]);
-        if (incRes.error) throw incRes.error;
-        if (expRes.error) throw expRes.error;
-        if (refRes.error) throw refRes.error;
-        incData = incRes.data;
-        expData = expRes.data;
-        refData = refRes.data;
-      }
+      [incData, expData, refData] = await Promise.all([
+        fetchAllRows('income', fetchCursor),
+        fetchAllRows('expenses', fetchCursor),
+        fetchAllRows('refreshments', fetchCursor),
+      ]);
 
       const safeMerge = async (tableName, serverData, defaultStatus) => {
         if (!serverData || serverData.length === 0) return;
@@ -202,37 +182,24 @@ export function useSync() {
       await safeMerge('expenses', expData, 'Paid');
       await safeMerge('refreshments', refData, 'Paid');
 
+      // Calculate max updated_at across all received rows
+      let maxCursor = fetchCursor;
+      const allReceived = [...(incData || []), ...(expData || []), ...(refData || [])];
+      for (const r of allReceived) {
+        if (r.updated_at && new Date(r.updated_at) > new Date(maxCursor)) {
+          maxCursor = r.updated_at;
+        }
+      }
+      const existingCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
+      const finalCursor = new Date(maxCursor) > new Date(existingCursor) ? maxCursor : existingCursor;
+      localStorage.setItem('dawa_last_sync_cursor', finalCursor);
+
       if (fullHistory) {
         // Full-history hydration complete
         localStorage.setItem('dawa_hydration_state', 'complete');
         console.log('[Hydration] Full history pulled and stored in Dexie.');
-      } else {
-        const monthStr = `${y}-${m}`;
-        const loadedMonthsStr = localStorage.getItem('dawa_loaded_months') || '[]';
-        let loadedMonths = [];
-        try {
-          loadedMonths = JSON.parse(loadedMonthsStr);
-          if (!Array.isArray(loadedMonths)) loadedMonths = [];
-        } catch (e) {
-          loadedMonths = [];
-        }
-        
-        const existingIndex = loadedMonths.findIndex(m => {
-          if (typeof m === 'string') return m === monthStr;
-          return m && m.month === monthStr;
-        });
-
-        const newEntry = { month: monthStr, fetchedAt: Date.now() };
-
-        if (existingIndex >= 0) {
-          loadedMonths[existingIndex] = newEntry;
-        } else {
-          loadedMonths.push(newEntry);
-        }
-        
-        localStorage.setItem('dawa_loaded_months', JSON.stringify(loadedMonths));
       }
-
+      
       setSyncStatus('synced');
       console.log('[Sync] Pull from cloud complete.');
     } catch (e) {

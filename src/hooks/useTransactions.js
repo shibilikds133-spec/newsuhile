@@ -103,24 +103,31 @@ export function useTransactions() {
       
       setGlobalSyncStatus('syncing');
       try {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = now.getMonth() + 1; // 1-indexed
+        const fetchAllRows = async (tableName, cursor = '1970-01-01T00:00:00.000Z') => {
+          const PAGE_SIZE = 1000;
+          let allData = [];
+          let from = 0;
+          while (true) {
+            const { data, error } = await supabase
+              .from(tableName)
+              .select('*')
+              .gt('updated_at', cursor)
+              .order('updated_at', { ascending: true })
+              .range(from, from + PAGE_SIZE - 1);
+            if (error) throw error;
+            allData = [...allData, ...(data || [])];
+            if (!data || data.length < PAGE_SIZE) break;
+            from += PAGE_SIZE;
+          }
+          return allData;
+        };
 
-        // Include last month so Dashboard's default "last month" view has data
-        const lastMonthDate = new Date(y, m - 2, 1);
-        const lastMonthStart = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}-01`;
-        const monthEnd = new Date(y, m, 0).toISOString().split('T')[0];
-
-        const [incRes, expRes, refRes] = await Promise.all([
-          supabase.from('income').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
-          supabase.from('expenses').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
-          supabase.from('refreshments').select('*').gte('date', lastMonthStart).lte('date', monthEnd),
+        const lastCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
+        const [incResData, expResData, refResData] = await Promise.all([
+          fetchAllRows('income', lastCursor),
+          fetchAllRows('expenses', lastCursor),
+          fetchAllRows('refreshments', lastCursor),
         ]);
-
-        if (incRes.error || expRes.error || refRes.error) {
-          throw new Error('Failed to fetch data from Supabase');
-        }
 
         // Safe merge remote data into local keeping local 'pending' items safe
         const safeMerge = async (tableName, serverData, defaultStatus) => {
@@ -156,9 +163,20 @@ export function useTransactions() {
           });
         };
 
-        await safeMerge('income', incRes.data, 'Received');
-        await safeMerge('expenses', expRes.data, 'Paid');
-        await safeMerge('refreshments', refRes.data, 'Paid');
+        await safeMerge('income', incResData, 'Received');
+        await safeMerge('expenses', expResData, 'Paid');
+        await safeMerge('refreshments', refResData, 'Paid');
+
+        let maxCursor = lastCursor;
+        const allReceived = [...(incResData || []), ...(expResData || []), ...(refResData || [])];
+        for (const r of allReceived) {
+          if (r.updated_at && new Date(r.updated_at) > new Date(maxCursor)) {
+            maxCursor = r.updated_at;
+          }
+        }
+        const existingCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
+        const finalCursor = new Date(maxCursor) > new Date(existingCursor) ? maxCursor : existingCursor;
+        localStorage.setItem('dawa_last_sync_cursor', finalCursor);
 
         // Mark both last month and current month as loaded in cache
         const currentMonthStr = `${y}-${String(m).padStart(2, '0')}`;
