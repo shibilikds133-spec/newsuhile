@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
 import { useForm } from '../hooks/useForm';
-import { REFRESHMENT_ITEMS } from '../constants/categories';
+import { REFRESHMENT_ITEMS, PAYMENT_STATUS } from '../constants/categories';
 import { validators } from '../utils/validators';
 import { newId } from '../utils/uuid';
 import { todayISO, formatINR, formatDate } from '../utils/formatters';
@@ -92,15 +92,12 @@ export default function Refreshment() {
               <Select 
                 label="Payment Status" 
                 name="paymentStatus" 
+                options={PAYMENT_STATUS}
                 required 
                 value={form.values.paymentStatus} 
                 onChange={form.handleChange}
                 error={form.errors.paymentStatus}
-              >
-                <option value="">Select Status...</option>
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-              </Select>
+              />
             </div>
             <Input label="Notes" name="notes" value={form.values.notes} onChange={form.handleChange} />
           </div>
@@ -159,7 +156,7 @@ export default function Refreshment() {
       <Modal 
         isOpen={!!paymentId} 
         title="Change Payment Status" 
-        message={`Are you sure you want to change the status of this refreshment to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Unpaid' : 'Paid'}?`}
+        message={`Are you sure you want to change the status of this refreshment to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Pending' : 'Paid'}?`}
         confirmVariant="primary"
         confirmLabel="Yes, Change Status"
         onCancel={() => setPaymentId(null)}

@@ -154,9 +154,9 @@ export function useSync() {
           const pendingIds = new Set(pending.map(r => r.id));
 
           // --- Soft Delete propagation: remove tombstones locally ---
-          // Only remove if NOT pending locally (pending = unsynced local change)
+          // UPDATE: Tombstone wins. Force delete even if pending locally.
           const tombstones = serverData.filter(
-            r => r.is_deleted === true && !pendingIds.has(r.id)
+            r => r.is_deleted === true
           );
           for (const r of tombstones) {
             await db[tableName].delete(r.id);

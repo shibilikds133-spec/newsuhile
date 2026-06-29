@@ -139,9 +139,9 @@ export function useTransactions() {
             const pendingIds = new Set(pending.map(r => r.id));
 
             // --- Soft Delete propagation: remove tombstones locally ---
-            // Only remove if NOT pending locally (pending = unsynced local change)
+            // UPDATE: Tombstone wins. Force delete even if pending locally.
             const tombstones = serverData.filter(
-              r => r.is_deleted === true && !pendingIds.has(r.id)
+              r => r.is_deleted === true
             );
             for (const r of tombstones) {
               await db[tableName].delete(r.id);
@@ -179,6 +179,11 @@ export function useTransactions() {
         localStorage.setItem('dawa_last_sync_cursor', finalCursor);
 
         // Mark both last month and current month as loaded in cache
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const lastMonthDate = new Date(y, m - 2, 1);
+        
         const currentMonthStr = `${y}-${String(m).padStart(2, '0')}`;
         const lastMonthStr = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
         markMonthFetched(currentMonthStr);
@@ -423,9 +428,9 @@ export function useTransactions() {
             const pendingIds = new Set(pending.map(r => r.id));
 
             // --- Soft Delete propagation: remove tombstones locally ---
-            // Only remove if NOT pending locally (pending = unsynced local change)
+            // UPDATE: Tombstone wins. Force delete even if pending locally.
             const tombstones = serverData.filter(
-              r => r.is_deleted === true && !pendingIds.has(r.id)
+              r => r.is_deleted === true
             );
             for (const r of tombstones) {
               await db[tableName].delete(r.id);

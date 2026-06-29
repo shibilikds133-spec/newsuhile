@@ -15,4 +15,4 @@ export const REFRESHMENT_ITEMS = ['Tea', 'Snacks', 'Meals'];
 
 export const PAYMENT_MODES = ['Cash', 'Bank Transfer', 'Cheque'];
 
-export const PAYMENT_STATUS = ['Paid', 'Unpaid'];
+export const PAYMENT_STATUS = ['Paid', 'Pending'];

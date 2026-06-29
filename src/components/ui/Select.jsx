@@ -18,7 +18,7 @@ export default function Select({ label, name, options = [], error, required, cla
         }`}
         {...props}
       >
-        <option value="" disabled>Select {label}</option>
+        <option value="" disabled hidden>Select {label}</option>
         {options.map((opt) => (
           <option key={opt} value={opt}>
             {opt}
