@@ -4,7 +4,7 @@ import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, REFRESHMENT_ITEMS } from '../../
 
 export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [paymentStatus, setPaymentStatus] = useState('All'); // All | Paid | Unpaid
+  const [paymentStatus, setPaymentStatus] = useState('All'); // All | Paid | Pending
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
@@ -134,7 +134,7 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
           <div className="border-t border-border pt-6 mb-8">
             <h4 className="font-extrabold text-sm text-gray-900 tracking-widest uppercase mb-4">Payment Status</h4>
             <div className="flex gap-2">
-              {['All', 'Paid', 'Unpaid'].map(status => (
+              {['All', 'Paid', 'Pending'].map(status => (
                 <button
                   key={status}
                   onClick={() => setPaymentStatus(status)}
@@ -142,8 +142,8 @@ export default function PrintSelectModal({ isOpen, onClose, onGenerate }) {
                     paymentStatus === status
                       ? status === 'Paid'
                         ? 'bg-green-600 text-white border-green-600 shadow-lg shadow-green-200'
-                        : status === 'Unpaid'
-                        ? 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-200'
+                        : status === 'Pending'
+                          ? 'bg-warning text-white border-warning shadow-lg shadow-yellow-200'
                         : 'bg-gray-800 text-white border-gray-800 shadow-lg shadow-gray-200'
                       : 'bg-white text-muted border-gray-100 hover:border-gray-200'
                   }`}

@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import DatePicker from '../components/ui/DatePicker';
 import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
@@ -220,7 +221,7 @@ export default function Income() {
         </div>
         <form onSubmit={form.handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <Input label="Date" name="date" type="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
+            <DatePicker label="Date" name="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
             <div className="flex flex-col gap-1">
               <Input 
                 label="Category" 

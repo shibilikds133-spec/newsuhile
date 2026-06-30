@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import DatePicker from '../components/ui/DatePicker';
 import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
@@ -29,7 +30,7 @@ export default function Expense() {
   const [deleteId, setDeleteId] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
   const [previewRecord, setPreviewRecord] = useState(null);
-  const [filter, setFilter] = useState('All'); // All | Paid | Unpaid
+  const [filter, setFilter] = useState('All'); // All | Paid | Pending
   const [activeTab, setActiveTab] = useState('add'); // 'add' | 'recent'
   const [catFilter, setCatFilter] = useState('All'); 
 
@@ -42,7 +43,7 @@ export default function Expense() {
       amount: '',
       amountInWords: '',
       paymentMode: 'Cash',
-      paymentStatus: 'Unpaid',
+      paymentStatus: 'Pending',
       approvedBy: '',
       remarks: '',
       manualVoucherNo: ''
@@ -90,10 +91,11 @@ export default function Expense() {
   };
 
   const totalPaid = expenses.filter(e => e.paymentStatus === 'Paid').reduce((sum, e) => sum + e.amount, 0);
-  const totalUnpaid = expenses.filter(e => e.paymentStatus === 'Unpaid').reduce((sum, e) => sum + e.amount, 0);
+  const totalUnpaid = expenses.filter(e => e.paymentStatus === 'Unpaid' || e.paymentStatus === 'Pending').reduce((sum, e) => sum + e.amount, 0);
 
   const filteredData = expenses.filter(e => {
-    if (filter !== 'All' && e.paymentStatus !== filter) return false;
+    if (filter === 'Paid' && e.paymentStatus !== 'Paid') return false;
+    if (filter === 'Pending' && e.paymentStatus !== 'Pending' && e.paymentStatus !== 'Unpaid') return false;
     if (catFilter !== 'All' && e.category !== catFilter) return false;
     return true;
   });
@@ -112,7 +114,7 @@ export default function Expense() {
       render: (r) => (
         <DropdownMenu>
           <Button variant="secondary" onClick={() => setPaymentId(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
-            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Unpaid' : 'Mark Paid'}
+            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Pending' : 'Mark Paid'}
           </Button>
           <Button variant="secondary" onClick={() => setPreviewRecord(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
             Voucher
@@ -170,7 +172,7 @@ export default function Expense() {
           <p className="text-xl font-bold text-primary">{formatINR(totalPaid)}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-l-4 border-l-danger shadow-sm">
-          <p className="text-sm text-muted">Total Unpaid</p>
+          <p className="text-sm text-muted">Total Pending</p>
           <p className="text-xl font-bold text-danger">{formatINR(totalUnpaid)}</p>
         </div>
       </div>
@@ -183,7 +185,7 @@ export default function Expense() {
         </div>
         <form onSubmit={form.handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <Input label="Date" name="date" type="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
+            <DatePicker label="Date" name="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
             <div className="flex flex-col gap-1">
               <Input 
                 label="Category" 
@@ -228,7 +230,7 @@ export default function Expense() {
         <div className="px-6 py-4 border-b border-border flex flex-col sm:flex-row justify-between items-center bg-gray-50 gap-4">
           <div className="flex flex-col sm:flex-row gap-3 items-center">
             <div className="flex bg-gray-200 rounded-md p-1">
-              {['All', 'Paid', 'Unpaid'].map(f => (
+              {['All', 'Paid', 'Pending'].map(f => (
                 <button 
                   key={f}
                   className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${filter === f ? 'bg-white shadow text-text' : 'text-muted hover:text-text'}`}
@@ -290,7 +292,7 @@ export default function Expense() {
       <Modal 
         isOpen={!!paymentId} 
         title="Change Payment Status" 
-        message={`Are you sure you want to change the status of this expense to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Unpaid' : 'Paid'}?`}
+        message={`Are you sure you want to change the status of this expense to ${(paymentId?.paymentStatus === 'Paid' || !paymentId?.paymentStatus) ? 'Pending' : 'Paid'}?`}
         confirmVariant="primary"
         confirmLabel="Yes, Change Status"
         onCancel={() => setPaymentId(null)}

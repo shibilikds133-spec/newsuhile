@@ -316,7 +316,7 @@ export function useTransactions() {
     if (type === 'income') {
       newStatus = (record.paymentStatus === 'Received' || !record.paymentStatus) ? 'Pending' : 'Received';
     } else {
-      newStatus = (record.paymentStatus === 'Paid' || !record.paymentStatus) ? 'Unpaid' : 'Paid';
+      newStatus = (record.paymentStatus === 'Paid' || !record.paymentStatus) ? 'Pending' : 'Paid';
     }
 
     await db[tableName].update(id, { paymentStatus: newStatus, synced: false, sync_status: 'pending' });
@@ -352,7 +352,7 @@ export function useTransactions() {
       .reduce((sum, r) => sum + Number(r.amount || 0), 0);
     const totalExpAll = expenses.reduce((sum, r) => sum + Number(r.amount || 0), 0);
     const totalUnp = expenses
-      .filter(r => r.paymentStatus === 'Unpaid')
+      .filter(r => r.paymentStatus === 'Unpaid' || r.paymentStatus === 'Pending')
       .reduce((sum, r) => sum + Number(r.amount || 0), 0);
     const totalRef = refreshments.reduce((sum, r) => sum + Number(r.amount || 0), 0);
 

@@ -16,6 +16,7 @@ import Table from '../components/ui/Table';
 import Button from '../components/ui/Button';
 import PrintSelectModal from '../components/documents/PrintSelectModal';
 import SmartPrintPreview from '../components/documents/SmartPrintPreview';
+import DatePicker from '../components/ui/DatePicker';
 
 export default function Reports() {
   const { allTransactions, fetchDateRangeFromServer } = useTransactions();
@@ -73,8 +74,8 @@ export default function Reports() {
     .filter(t => {
       if (t.type === 'refreshment') return true;
       if (t.type === 'expense') {
-        // If user explicitly filtered for Unpaid, show Unpaid total
-        if (paymentFilter === 'Unpaid') return t.paymentStatus === 'Unpaid';
+        // If user explicitly filtered for Pending, show Pending total
+        if (paymentFilter === 'Pending') return t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending';
         // Otherwise, only count Paid expenses towards cash spent
         return t.paymentStatus === 'Paid';
       }
@@ -226,7 +227,7 @@ export default function Reports() {
                     ) : (
                       <>
                         <option value="Paid">Paid</option>
-                        <option value="Unpaid">Unpaid</option>
+                        <option value="Pending">Pending</option>
                       </>
                     )}
                   </select>
@@ -236,12 +237,10 @@ export default function Reports() {
           )}
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted font-medium">From Date</label>
-            <input type="date" className="border border-border rounded px-2 py-1.5 text-sm w-full" value={fromDate} onChange={e => setFromDate(e.target.value)} />
+            <DatePicker label="From Date" name="fromDate" value={fromDate} onChange={(e) => setFromDate(e.target ? e.target.value : e)} />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted font-medium">To Date</label>
-            <input type="date" className="border border-border rounded px-2 py-1.5 text-sm w-full" value={toDate} onChange={e => setToDate(e.target.value)} />
+            <DatePicker label="To Date" name="toDate" value={toDate} onChange={(e) => setToDate(e.target ? e.target.value : e)} />
           </div>
         </div>
       </div>

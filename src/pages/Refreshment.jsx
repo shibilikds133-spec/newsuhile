@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import DatePicker from '../components/ui/DatePicker';
 import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
@@ -61,7 +62,7 @@ export default function Refreshment() {
       render: (r) => (
         <DropdownMenu>
           <Button variant="secondary" onClick={() => setPaymentId(r)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-gray-100 !text-gray-700">
-            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Unpaid' : 'Mark Paid'}
+            {(r.paymentStatus === 'Paid' || !r.paymentStatus) ? 'Mark Pending' : 'Mark Paid'}
           </Button>
           <Button variant="danger" onClick={() => setDeleteId(r.id)} className="w-full !justify-start !border-0 !shadow-none !bg-transparent hover:!bg-red-50 !text-red-600">
             Delete
@@ -84,7 +85,7 @@ export default function Refreshment() {
         </div>
         <form onSubmit={form.handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-            <Input label="Date" name="date" type="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
+            <DatePicker label="Date" name="date" required value={form.values.date} onChange={form.handleChange} error={form.errors.date} />
             <Select label="Item" name="item" options={REFRESHMENT_ITEMS} required value={form.values.item} onChange={form.handleChange} error={form.errors.item} />
             <Input label="Qty" name="quantity" type="number" min="1" required value={form.values.quantity} onChange={form.handleChange} error={form.errors.quantity} />
             <Input label="Amount (₹)" name="amount" type="number" min="1" required value={form.values.amount} onChange={form.handleChange} error={form.errors.amount} />

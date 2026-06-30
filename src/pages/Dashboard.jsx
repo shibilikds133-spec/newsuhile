@@ -5,9 +5,10 @@ import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import Table from '../components/ui/Table';
 import { format, subMonths } from 'date-fns';
-import { TrendingUp, TrendingDown, Scale, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, Scale, RefreshCw, Heart, ShoppingBasket, Plus, Minus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EmptyState from '../components/ui/EmptyState';
+import MonthPicker from '../components/ui/MonthPicker';
 
 export default function Dashboard() {
   const { 
@@ -21,7 +22,7 @@ export default function Dashboard() {
     fetchDateRangeFromServer
   } = useTransactions();
   
-  const [selectedMonth, setSelectedMonth] = useState(format(subMonths(new Date(), 1), 'yyyy-MM'));
+  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' | 'overall'
 
   // Auto-fetch data for whichever month the user selects
@@ -62,7 +63,7 @@ export default function Dashboard() {
 
   const monthlyUnpaid = useMemo(() => 
     filteredTransactions
-      .filter(t => t.type === 'expense' && t.paymentStatus === 'Unpaid')
+      .filter(t => t.type === 'expense' && (t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending'))
       .reduce((sum, t) => sum + Number(t.amount || 0), 0)
   , [filteredTransactions]);
 
@@ -103,8 +104,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-0">
+
+      {/* ── DESKTOP HEADER (visible md+) ── */}
+      <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text">Dashboard</h1>
@@ -117,120 +120,177 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        
-        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-          {/* Mobile toggle */}
-          <div className="flex md:!hidden bg-white p-1 rounded-lg border border-border shadow-sm">
-            <button 
-              onClick={() => setViewMode('monthly')}
-              className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${viewMode === 'monthly' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-text'}`}
-            >
-              Monthly
-            </button>
-            <button 
-              onClick={() => setViewMode('overall')}
-              className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${viewMode === 'overall' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-text'}`}
-            >
-              Overall
-            </button>
-          </div>
-
+        <div className="flex items-center gap-3">
           {/* Desktop Month Picker */}
           <div className="hidden md:block">
-             <input 
-              type="month" 
+            <MonthPicker
               value={selectedMonth}
-              onChange={(e) => {
-                setSelectedMonth(e.target.value);
+              onChange={(val) => {
+                setSelectedMonth(val);
                 setViewMode('monthly');
               }}
-              className="border border-border bg-white rounded-md px-4 py-2 text-sm font-medium shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-text"
             />
           </div>
         </div>
       </div>
 
-      {/* Mobile Layout (hidden on md and up) */}
-      <div className="md:!hidden space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Card 
-            label="INCOME" 
-            value={formatINR(displayIncome)} 
-            accent="green" 
-            icon={TrendingUp} 
-            className="text-center p-3"
-          />
-          <Card 
-            label="EXPENSE" 
-            value={formatINR(displayExpense)} 
-            accent="red" 
-            icon={TrendingDown} 
-            className="text-center p-3"
-          />
-        </div>
+      {/* ══════════════════════════════════════
+          MOBILE LAYOUT (hidden on md and up)
+      ══════════════════════════════════════ */}
+      <div className="md:!hidden flex flex-col gap-6 pb-28">
 
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden h-44 flex flex-col justify-end">
-          <div className="absolute top-4 right-4 opacity-10">
-            <Scale size={120} strokeWidth={1} />
+        {/* ── HERO NET BALANCE CARD ── */}
+        <div className="bg-gradient-to-br from-[#004d40] to-[#00695C] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group border border-white/10">
+          {/* Subtle background decoration */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-700 ease-in-out"></div>
+          <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-[#00342b]/20 rounded-full blur-xl"></div>
+          
+          <div className="relative z-10 flex flex-col gap-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="text-[12px] font-semibold text-[#94d3c1] uppercase tracking-wider opacity-80">
+                  {viewMode === 'monthly' ? format(new Date(selectedMonth + '-01'), 'MMM yyyy') : 'All Time'}
+                </span>
+                <h2 className="text-sm font-medium text-[#afefdd] opacity-90 mt-1">Net Balance (Shishtam)</h2>
+              </div>
+              {/* Month Selector Dropdown */}
+              {viewMode === 'monthly' && (
+                <div>
+                  <MonthPicker
+                    value={selectedMonth}
+                    onChange={(val) => setSelectedMonth(val)}
+                    dark={true}
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-1 flex items-center gap-3">
+              <span className="text-[28px] font-bold tracking-tight">
+                {formatINR(displayNetBalance)}
+              </span>
+              {syncStatus === 'syncing' && (
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-300 animate-pulse ml-2" />
+              )}
+            </div>
+            
+            {/* Controls Toggle */}
+            <div className="mt-3 flex bg-black/20 rounded-lg p-1 w-fit backdrop-blur-sm border border-white/5">
+              <button 
+                onClick={() => setViewMode('monthly')}
+                className={`px-4 py-1 rounded-md text-[12px] shadow-sm transition-all font-medium ${viewMode === 'monthly' ? 'bg-white text-[#00342b]' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+              >
+                Month
+              </button>
+              <button 
+                onClick={() => setViewMode('overall')}
+                className={`px-4 py-1 rounded-md text-[12px] transition-all font-medium ${viewMode === 'overall' ? 'bg-white text-[#00342b]' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+              >
+                All
+              </button>
+            </div>
           </div>
-          <p className="text-sm font-bold opacity-80 uppercase tracking-widest mb-1">Net Balance</p>
-          <h3 className="text-4xl font-black tracking-tight">{formatINR(displayNetBalance)}</h3>
         </div>
 
-        {displayUnpaid > 0 && (
-          <Card 
-            label="PENDING / UNPAID" 
-            value={formatINR(displayUnpaid)} 
-            accent="amber" 
-            icon={TrendingDown} 
-            className="bg-amber-50/50"
-          />
-        )}
-      </div>
-
-      {/* Desktop Layout (hidden on mobile, visible on md and up) */}
-      <div className="hidden md:grid md:grid-cols-4 gap-4">
-        <Card 
-          label="Total Income (Varav)" 
-          value={formatINR(displayIncome)} 
-          accent="green" 
-          icon={TrendingUp} 
-        />
-        <Card 
-          label="Paid Expense (Chilav)" 
-          value={formatINR(displayExpense)} 
-          accent="red" 
-          icon={TrendingDown} 
-        />
-        <Card 
-          label="Pending / Unpaid" 
-          value={formatINR(displayUnpaid)} 
-          accent="blue" 
-          icon={TrendingDown} 
-        />
-        <Card 
-          label="Net Balance (Shishtam)" 
-          value={formatINR(displayNetBalance)} 
-          accent="blue" 
-          icon={Scale} 
-        />
-      </div>
-
-      {viewMode === 'monthly' && (
-        <div className="md:!hidden bg-primary-light/50 p-4 rounded-lg border border-primary-light flex items-center justify-between">
-          <p className="text-sm font-medium text-primary-dark">
-            Showing data for: <span className="font-bold">{format(new Date(selectedMonth + '-01'), 'MMMM yyyy')}</span>
-          </p>
-          <input 
-            type="month" 
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="border-none bg-white rounded px-2 py-1 text-sm font-bold shadow-sm focus:ring-primary"
-          />
+        {/* ── FINANCIAL OVERVIEW (Split View) ── */}
+        <div className="bg-white rounded-xl p-4 shadow-md flex justify-between items-center border border-[#e1e3e0]/50 relative overflow-hidden">
+          <div className="flex-1 flex flex-col items-center justify-center p-2 relative z-10">
+            <span className="text-[12px] font-medium text-[#3f4945] flex items-center gap-1 mb-1">
+              <span className="w-2 h-2 rounded-full bg-primary"></span>
+              Income
+            </span>
+            <span className="text-[16px] font-semibold text-[#191c1b]">{formatINR(displayIncome)}</span>
+          </div>
+          {/* Vertical Divider */}
+          <div className="w-px h-12 bg-[#e1e3e0] relative z-10"></div>
+          <div className="flex-1 flex flex-col items-center justify-center p-2 relative z-10">
+            <span className="text-[12px] font-medium text-[#3f4945] flex items-center gap-1 mb-1">
+              <span className="w-2 h-2 rounded-full bg-[#ba1a1a]"></span>
+              Expense
+            </span>
+            <span className="text-[16px] font-semibold text-[#191c1b]">{formatINR(displayExpense)}</span>
+          </div>
         </div>
-      )}
 
-      <div className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
+        {/* ── RECENT TRANSACTIONS ── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-end">
+            <h3 className="text-[18px] font-semibold text-[#191c1b]">Recent Transactions</h3>
+            <Link to="/reports" className="text-[12px] font-medium text-[#00342b] hover:text-[#94d3c1] transition-colors">See All</Link>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((tx) => (
+                <div key={tx.id} className="bg-white p-4 rounded-xl flex items-center justify-between shadow-sm hover:shadow-md transition-shadow group border border-transparent hover:border-[#e1e3e0]/30">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                      tx.type === 'income' 
+                        ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' 
+                        : 'bg-danger/10 text-danger group-hover:bg-danger group-hover:text-white'
+                    }`}>
+                      {tx.type === 'income' ? <Heart size={20} className="fill-current" /> : <ShoppingBasket size={20} className="fill-current" />}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[14px] font-medium text-[#191c1b]">{tx.category || tx.item || 'Transaction'}</span>
+                      <span className="text-[12px] font-medium text-[#3f4945]">{format(new Date(tx.date), 'dd MMM yyyy')}</span>
+                    </div>
+                  </div>
+                  <span className={`text-[14px] font-semibold ${tx.type === 'income' ? 'text-primary' : 'text-danger'}`}>
+                    {tx.type === 'income' ? '+' : '-'} {formatINR(tx.amount)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="py-6 flex flex-col items-center justify-center opacity-40">
+                <div className="w-12 h-1 bg-[#e1e3e0] rounded-full mb-4"></div>
+                <p className="text-sm">No transactions found</p>
+              </div>
+            )}
+            
+            {/* End indicator */}
+            {recentTransactions.length > 0 && (
+              <div className="py-2 flex justify-center opacity-40">
+                <div className="w-12 h-1 bg-[#e1e3e0] rounded-full"></div>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ══ END MOBILE LAYOUT ══ */}
+
+      {/* ── DESKTOP LAYOUT (hidden on mobile, visible on md and up) ── */}
+      <div className="hidden md:grid md:grid-cols-4 gap-4 mt-6">
+        <Card
+          label="Total Income (Varav)"
+          value={formatINR(displayIncome)}
+          accent="green"
+          icon={TrendingUp}
+        />
+        <Card
+          label="Paid Expense (Chilav)"
+          value={formatINR(displayExpense)}
+          accent="red"
+          icon={TrendingDown}
+        />
+        <Card
+          label="Pending / Unpaid"
+          value={formatINR(displayUnpaid)}
+          accent="blue"
+          icon={TrendingDown}
+        />
+        <Card
+          label="Net Balance (Shishtam)"
+          value={formatINR(displayNetBalance)}
+          accent="blue"
+          icon={Scale}
+        />
+      </div>
+
+      {/* Desktop recent transactions table */}
+      <div className="hidden md:block mt-6 bg-white rounded-lg border border-border shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-semibold text-text">Recent Transactions</h2>
         </div>
@@ -244,13 +304,15 @@ export default function Dashboard() {
             </div>
           </div>
         ) : (
-          <EmptyState 
+          <EmptyState
             icon={TrendingUp}
             title="No transactions yet"
             description="Start adding income and expenses to see them here."
           />
         )}
       </div>
+
     </div>
   );
 }
+

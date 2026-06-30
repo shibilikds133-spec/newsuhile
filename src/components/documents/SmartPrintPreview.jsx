@@ -40,7 +40,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const unpaidExpense = data
-    .filter(t => t.type === 'expense' && t.paymentStatus === 'Unpaid')
+    .filter(t => t.type === 'expense' && (t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending'))
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const netBalance = totalIncome - paidExpense;

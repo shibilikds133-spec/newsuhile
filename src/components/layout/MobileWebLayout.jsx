@@ -9,7 +9,9 @@ import {
   Settings,
   X,
   Cloud,
-  CloudOff
+  CloudOff,
+  Plus,
+  Minus
 } from 'lucide-react';
 import { useTransactions } from '../../hooks/useTransactions';
 
@@ -86,19 +88,17 @@ export default function MobileWebLayout() {
       </main>
 
       {/* Floating Action Buttons (FAB) */}
-      <div className="fixed bottom-24 left-0 right-0 flex justify-center gap-6 z-[45] pointer-events-none">
-        <NavLink 
-          to="/income" 
-          className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-primary/40 active:scale-95 transition-all pointer-events-auto border-4 border-white text-3xl font-light"
-        >
-          +
-        </NavLink>
-        <NavLink 
-          to="/expense" 
-          className="w-16 h-16 bg-danger text-white rounded-full flex items-center justify-center shadow-lg shadow-danger/40 active:scale-95 transition-all pointer-events-auto border-4 border-white text-3xl font-light"
-        >
-          &minus;
-        </NavLink>
+      <div className="fixed bottom-[88px] left-0 w-full px-4 z-40 md:hidden pointer-events-none">
+        <div className="max-w-2xl mx-auto flex gap-4 justify-between">
+          <NavLink to="/income" className="flex-1 bg-primary text-white py-3 px-4 rounded-full text-[14px] font-semibold shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 pointer-events-auto active:scale-95 active:opacity-90">
+            <Plus size={20} />
+            Add Income
+          </NavLink>
+          <NavLink to="/expense" className="flex-1 bg-white text-danger border border-danger/20 py-3 px-4 rounded-full text-[14px] font-semibold shadow-lg hover:bg-danger/10 transition-colors flex items-center justify-center gap-2 pointer-events-auto active:scale-95 active:opacity-90">
+            <Minus size={20} />
+            Add Expense
+          </NavLink>
+        </div>
       </div>
 
       {/* Quick Access Sidebar/Menu Overlay */}
