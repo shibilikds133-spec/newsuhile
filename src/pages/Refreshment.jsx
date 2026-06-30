@@ -5,7 +5,6 @@ import { REFRESHMENT_ITEMS, PAYMENT_STATUS } from '../constants/categories';
 import { validators } from '../utils/validators';
 import { newId } from '../utils/uuid';
 import { todayISO, formatINR, formatDate } from '../utils/formatters';
-import { exportToExcel } from '../utils/exportExcel';
 import toast from 'react-hot-toast';
 
 import Input from '../components/ui/Input';
@@ -118,18 +117,6 @@ export default function Refreshment() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => {
-              if (refreshments.length === 0) return toast.error('No data to export');
-              exportToExcel(refreshments, [
-                 { key: 'date', label: 'Date' },
-                 { key: 'item', label: 'Item' },
-                 { key: 'quantity', label: 'Qty' },
-                 { key: 'amount', label: 'Amount' },
-                 { key: 'notes', label: 'Notes' }
-              ], `refreshment-report-${todayISO()}.xlsx`);
-            }}>
-              Download Excel
-            </Button>
           </div>
         </div>
         

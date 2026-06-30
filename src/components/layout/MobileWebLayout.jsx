@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  TrendingUp, 
-  TrendingDown, 
-  Coffee, 
+import {
+  LayoutDashboard,
+  TrendingUp,
+  TrendingDown,
+  Coffee,
   FileBarChart,
   Settings,
   X,
   Cloud,
   CloudOff,
   Plus,
-  Minus
+  Minus,
+  Lock
 } from 'lucide-react';
 import { useTransactions } from '../../hooks/useTransactions';
 
@@ -35,7 +36,7 @@ const routeTitles = {
 
 export default function MobileWebLayout() {
   const location = useLocation();
-  const currentTitle = routeTitles[location.pathname] || 'Dawa Trust';
+  const currentTitle = routeTitles[location.pathname] || 'MAKHDOOMIYYA';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { syncStatus } = useTransactions();
 
@@ -48,13 +49,13 @@ export default function MobileWebLayout() {
             <img src="./image/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight leading-none text-white">Dawa Trust</h1>
+            <h1 className="text-xl font-bold tracking-tight leading-none text-white">MAKHDOOMIYYA</h1>
             {currentTitle !== 'Dashboard' && (
               <span className="text-[10px] text-white/60 font-medium uppercase tracking-widest">{currentTitle}</span>
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {/* Sync Status Indicator */}
           <div className="flex items-center bg-black/20 px-2 py-1 rounded-full border border-white/10">
@@ -62,8 +63,8 @@ export default function MobileWebLayout() {
             {syncStatus === 'syncing' && <Cloud size={14} className="text-blue-400 animate-pulse" />}
             {syncStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/80"
           >
@@ -76,7 +77,8 @@ export default function MobileWebLayout() {
       <main className="flex-1 overflow-y-auto pb-32 p-4 pt-4">
         <div className="max-w-md mx-auto">
           {/* Inject a style to hide redundant page headers in mobile layout */}
-          <style dangerouslySetInnerHTML={{ __html: `
+          <style dangerouslySetInnerHTML={{
+            __html: `
             .mobile-layout main h1 { display: none !important; }
             .mobile-layout .space-y-6 > div:first-child { margin-bottom: 0 !important; }
             /* Hide the "Add New Income" title bar as well to save space */
@@ -104,7 +106,7 @@ export default function MobileWebLayout() {
       {/* Quick Access Sidebar/Menu Overlay */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-all" onClick={() => setIsMenuOpen(false)}>
-          <div 
+          <div
             className="absolute right-0 top-0 h-full w-72 bg-white shadow-2xl p-6 flex flex-col animate-in slide-in-from-right duration-300"
             onClick={e => e.stopPropagation()}
           >
@@ -114,10 +116,10 @@ export default function MobileWebLayout() {
                 <X size={20} />
               </button>
             </div>
-            
+
             <nav className="flex flex-col gap-3">
-              <NavLink 
-                to="/system-admin" 
+              <NavLink
+                to="/system-admin"
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-3 p-4 rounded-2xl hover:bg-primary-light text-text font-medium transition-all border border-transparent hover:border-primary/20 shadow-sm hover:shadow-md"
               >
@@ -129,13 +131,28 @@ export default function MobileWebLayout() {
                   <div className="text-[10px] text-muted uppercase tracking-wider">Technical Settings</div>
                 </div>
               </NavLink>
+
+              {localStorage.getItem('app_password') && (
+                <button
+                  onClick={() => window.location.reload()}
+                  className="flex items-center gap-3 p-4 rounded-2xl hover:bg-red-50 text-danger font-medium transition-all border border-transparent hover:border-red-100 shadow-sm hover:shadow-md text-left w-full"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-red-100 text-danger flex items-center justify-center">
+                    <Lock size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold">Lock App</div>
+                    <div className="text-[10px] text-danger/70 uppercase tracking-wider">Require Password</div>
+                  </div>
+                </button>
+              )}
             </nav>
-            
+
             <div className="mt-auto pt-6 border-t border-border text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-2xl flex items-center justify-center">
                 <img src="./image/logo.png" alt="Logo" className="w-12 h-12 object-contain grayscale opacity-30" />
               </div>
-              <p className="text-xs text-muted font-bold">Dawa Trust Dashboard</p>
+              <p className="text-xs text-muted font-bold">MAKHDOOMIYYA Dashboard</p>
               <p className="text-[10px] text-muted/50 mt-1 uppercase tracking-[0.2em]">Version 1.0.0</p>
             </div>
           </div>
@@ -149,10 +166,9 @@ export default function MobileWebLayout() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 py-1.5 px-1 transition-all duration-300 flex-1 ${
-                isActive
-                  ? 'text-primary'
-                  : 'text-muted'
+              `flex flex-col items-center gap-0.5 py-1.5 px-1 transition-all duration-300 flex-1 ${isActive
+                ? 'text-primary'
+                : 'text-muted'
               }`
             }
           >
@@ -169,9 +185,11 @@ export default function MobileWebLayout() {
           </NavLink>
         ))}
       </nav>
-      
+
       {/* Safe Area Inset for iOS */}
       <div className="h-safe-area-bottom bg-white" />
     </div>
   );
 }
+
+

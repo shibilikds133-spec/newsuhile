@@ -255,16 +255,6 @@ export default function Reports() {
         <div className="px-6 pb-4 flex justify-between items-center export-buttons">
           <h2 className="text-base font-semibold text-text">Filtered Transactions ({filteredData.length})</h2>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => {
-              exportToExcel(filteredData, [
-                { key: 'date', label: 'Date' },
-                { key: 'type', label: 'Type' },
-                { key: 'category', label: 'Category' },
-                { key: 'description', label: 'Description' },
-                { key: 'amount', label: 'Amount' },
-                { key: 'status', label: 'Status' }
-              ], `full-report-${todayISO()}.xlsx`);
-            }}>Excel</Button>
             <Button variant="primary" onClick={async () => {
               if (fromDate && toDate) {
                 toast.loading('Checking and fetching report data...', { id: 'fetch-reports' });

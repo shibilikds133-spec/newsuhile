@@ -1,13 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 import { formatINR, formatDate, todayISO } from '../../utils/formatters';
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
-import { exportToExcel } from '../../utils/exportExcel';
 import PrintLayout from './PrintLayout';
 
 export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
   const printRef = useRef(null);
   const [showDetailed, setShowDetailed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const summaryData = React.useMemo(() => {
     if (!data) return [];
@@ -25,7 +32,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
     }));
   }, [data]);
 
-  if (!isOpen || !data) return null;
+  if (!isOpen || !data || !mounted) return null;
 
   const totalIncome = data
     .filter(t => t.type === 'income')
@@ -243,11 +250,11 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         y += 8;
 
         const detailCols = [
-          { label: 'Date', w: 16 },
-          { label: 'Type', w: 13 },
-          { label: 'Category', w: 30 },
-          { label: 'Description', w: 100 },
-          { label: 'Amount', w: 21, align: 'right' },
+          { label: 'Date', w: 22 },
+          { label: 'Type', w: 32 },
+          { label: 'Category', w: 45 },
+          { label: 'Description', w: 56 },
+          { label: 'Amount', w: 25, align: 'right' },
         ];
 
         doc.setFillColor(71, 85, 105); // slate-600
@@ -285,10 +292,12 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
           doc.setTextColor(30, 41, 59);
           cx += detailCols[1].w;
 
-          doc.text((t.category || t.item || '').substring(0, 16), cx + 2, y + 4.5);
+          // Safely truncate category to fit within 43mm width
+          doc.text((t.category || t.item || '').substring(0, 24), cx + 2, y + 4.5);
           cx += detailCols[2].w;
 
-          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 60), cx + 2, y + 4.5);
+          // Safely truncate description to fit within 69mm width
+          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 42), cx + 2, y + 4.5);
           cx += detailCols[3].w;
 
           doc.setFont('helvetica', 'bold');
@@ -323,36 +332,23 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
     }
   };
 
-  const handleExportExcel = () => {
-    const columns = [
-      { key: 'date', label: 'Date' },
-      { key: 'type', label: 'Type' },
-      { key: 'category', label: 'Category' },
-      { key: 'description', label: 'Description' },
-      { key: 'amount', label: 'Amount' },
-      { key: 'paymentStatus', label: 'Status' },
-    ];
-    const preparedData = data.map(t => ({
-      ...t,
-      category: t.category || t.item,
-      description: t.payerName || t.paidTo || t.notes || '-',
-    }));
-    exportToExcel(preparedData, columns, `MKD-Report-${todayISO()}.xlsx`);
-    toast.success('Excel Downloaded!');
-  };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 exclude-from-print">
-      <div className="absolute inset-0 bg-black/70 exclude-from-print" onClick={onClose} />
 
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden z-10 flex flex-col exclude-from-print">
-        {/* Action Bar */}
-        <div className="no-print flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 border-b bg-gray-50 shrink-0 gap-3">
-          <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-            <h3 className="text-sm font-bold text-gray-800 tracking-tight">Report Preview</h3>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex sm:items-center sm:justify-center sm:p-4 exclude-from-print">
+      <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-sm exclude-from-print transition-opacity" onClick={onClose} />
+
+      <div className="bg-slate-100 sm:rounded-xl shadow-2xl w-full h-full sm:h-auto max-w-6xl sm:max-h-[95vh] overflow-hidden z-10 flex flex-col exclude-from-print animate-in fade-in zoom-in-95 duration-200">
+        {/* Immersive Action Bar */}
+        <div className="no-print flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 border-b bg-white shadow-sm shrink-0 gap-2 z-20">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors active:bg-gray-200">
+              <X size={24} />
+            </button>
+            <h3 className="hidden sm:block text-base font-bold text-gray-800 tracking-tight">Report Preview</h3>
             
             {/* Toggle Detailed View */}
-            <label className="flex items-center gap-2 cursor-pointer select-none">
+            <label className="flex items-center gap-2.5 cursor-pointer select-none bg-gray-50 px-3 py-1.5 sm:py-2 rounded-md border border-gray-200 shadow-sm hover:border-gray-300 transition-colors ml-1 sm:ml-0">
               <div className="relative">
                 <input 
                   type="checkbox" 
@@ -360,29 +356,34 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                   checked={showDetailed}
                   onChange={(e) => setShowDetailed(e.target.checked)}
                 />
-                <div className="w-8 h-4 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-full"></div>
+                <div className="w-8 h-4.5 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:after:translate-x-full"></div>
               </div>
-              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Detailed</span>
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-widest mt-[1px]">Detailed</span>
             </label>
           </div>
 
-          <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-            <button onClick={onClose} className="flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-bold border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 whitespace-nowrap">
-              Close
-            </button>
-            <button onClick={handleExportExcel} className="flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-bold border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 whitespace-nowrap">
-              📊 Excel
-            </button>
-            <button onClick={handleDownloadPDF} className="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-sm whitespace-nowrap">
-              ⬇ Download
+          <div className="flex items-center gap-3 pr-2 sm:pr-0">
+            <button onClick={handleDownloadPDF} className="px-4 sm:px-5 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-sm whitespace-nowrap flex items-center gap-2 transition-colors active:scale-95">
+              <span>⬇</span>
+              <span className="hidden sm:inline">Download</span>
+              <span className="sm:hidden">PDF</span>
             </button>
           </div>
         </div>
 
         {/* Scrollable Preview Area */}
-        <div className="flex-1 overflow-auto bg-slate-100 p-2 sm:p-4 report-preview-scroll scrollbar-thin">
-          <div className="min-w-fit flex justify-start sm:justify-center">
-            <div ref={printRef} className="mx-auto print-content shadow-2xl bg-white origin-top" style={{ width: '210mm' }}>
+        <div className="flex-1 overflow-auto bg-slate-100 p-0 sm:p-6 report-preview-scroll scrollbar-thin">
+          <div className="flex justify-center min-w-fit w-full pb-10 pt-4 sm:pt-0">
+            <div 
+              ref={printRef} 
+              className="print-content shadow-2xl bg-white shrink-0 mx-auto" 
+              style={{ 
+                width: '210mm', 
+                minWidth: '210mm', 
+                minHeight: '297mm',
+                zoom: 'min(1, calc(100vw / 820))'
+              }}
+            >
             <PrintLayout 
               title={filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} (Category-wise summary)` : 'Financial Summary'} 
               dateRange={filters?.fromDate ? `${formatDate(filters.fromDate)} - ${formatDate(filters.toDate)}` : 'Full Period'}
@@ -435,24 +436,24 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                     Detailed Transaction Log
                   </h3>
                   <div className="rounded border border-slate-200 overflow-hidden shadow-sm">
-                    <table className="w-full text-[10px] border-collapse bg-white">
+                    <table className="w-full text-[10px] border-collapse bg-white table-fixed">
                       <thead>
                         <tr className="bg-slate-800 text-white font-bold uppercase tracking-wider">
-                          <th className="text-left px-3 py-1.5">Date</th>
-                          <th className="text-left px-3 py-1.5">Type</th>
-                          <th className="text-left px-3 py-1.5">Category</th>
-                          <th className="text-left px-3 py-1.5">Description</th>
-                          <th className="text-right px-3 py-1.5">Amount</th>
+                          <th className="text-left px-3 py-1.5" style={{ width: '90px' }}>Date</th>
+                          <th className="text-left px-3 py-1.5" style={{ width: '110px' }}>Type</th>
+                          <th className="text-left px-3 py-1.5" style={{ width: '200px' }}>Category</th>
+                          <th className="text-left px-3 py-1.5" style={{ width: '320px' }}>Description</th>
+                          <th className="text-right px-3 py-1.5" style={{ width: '120px' }}>Amount</th>
                         </tr>
                       </thead>
                       <tbody>
                         {data.map((t, idx) => (
                           <tr key={idx} className="border-b border-slate-100 last:border-0">
-                            <td className="px-3 py-1 text-slate-500 font-medium">{formatDate(t.date)}</td>
-                            <td className={`px-3 py-1 font-bold uppercase text-[9px] ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>{t.type}</td>
-                            <td className="px-3 py-1 font-bold text-slate-700">{t.category || t.item}</td>
-                            <td className="px-3 py-1 text-slate-600 italic">{(t.payerName || t.paidTo || t.notes || '-').substring(0, 60)}</td>
-                            <td className={`px-3 py-1 text-right font-bold ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
+                            <td className="px-3 py-1 text-slate-500 font-medium whitespace-nowrap overflow-hidden">{formatDate(t.date)}</td>
+                            <td className={`px-3 py-1 font-bold uppercase text-[9px] whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>{t.type}</td>
+                            <td className="px-3 py-1 font-bold text-slate-700 truncate">{t.category || t.item}</td>
+                            <td className="px-3 py-1 text-slate-600 italic truncate">{(t.payerName || t.paidTo || t.notes || '-').substring(0, 60)}</td>
+                            <td className={`px-3 py-1 text-right font-bold whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
                               {formatINR(t.amount).replace('₹', '').trim()}
                             </td>
                           </tr>
@@ -467,6 +468,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         </div>
       </div>
     </div>
-  </div>
-);
+    </div>,
+    document.body
+  );
 }

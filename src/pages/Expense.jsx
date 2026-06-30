@@ -252,19 +252,6 @@ export default function Expense() {
             </select>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => {
-              if (filteredData.length === 0) return toast.error('No data to export');
-              exportToExcel(filteredData, [
-                 { key: 'date', label: 'Date' },
-                 { key: 'voucherNo', label: 'Voucher No' },
-                 { key: 'category', label: 'Category' },
-                 { key: 'paidTo', label: 'Paid To' },
-                 { key: 'amount', label: 'Amount' },
-                 { key: 'paymentStatus', label: 'Status' }
-              ], `expense-report-${todayISO()}.xlsx`);
-            }}>
-              Download Excel
-            </Button>
           </div>
         </div>
         

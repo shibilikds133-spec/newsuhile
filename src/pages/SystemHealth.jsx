@@ -10,8 +10,9 @@ import Button from '../components/ui/Button';
 import {
   Activity, Database, AlertCircle, RefreshCw, Trash2,
   HardDrive, Wifi, WifiOff, CheckCircle, Clock, XCircle, Heart, List,
-  Download, Upload, ShieldCheck
+  Download, Upload, ShieldCheck, Lock
 } from 'lucide-react';
+import { hashPassword } from '../utils/crypto';
 import Modal from '../components/ui/Modal';
 import { exportDB, importDB } from 'dexie-export-import';
 import { saveAs } from 'file-saver';
@@ -33,15 +34,22 @@ export default function SystemHealth() {
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
 
+  const [hasPassword, setHasPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isSettingPassword, setIsSettingPassword] = useState(false);
+
   // ── Fetch all stats ──────────────────────────────────────────────────────
   const fetchStats = useCallback(async () => {
     // DB record counts
-    const [incCount, expCount, refCount] = await Promise.all([
+    const [incCount, expCount, refCount, passConfig] = await Promise.all([
       db.income.count(),
       db.expenses.count(),
       db.refreshments.count(),
+      db.app_config.get('password_hash'),
     ]);
     setDbStats({ income: incCount, expenses: expCount, refreshments: refCount });
+    setHasPassword(!!passConfig);
 
     // Sync status counts (pending / synced / failed)
     const counts = await getSyncCounts();
@@ -211,6 +219,69 @@ export default function SystemHealth() {
     }
   };
 
+  const handleSetPassword = async () => {
+    if (!newPassword) return;
+    
+    if (hasPassword) {
+      if (!currentPassword) {
+        toast.error('Please enter your current password first');
+        return;
+      }
+      const currentHash = await hashPassword(currentPassword);
+      const storedConfig = await db.app_config.get('password_hash');
+      if (currentHash !== storedConfig.value) {
+        toast.error('Current password is incorrect');
+        return;
+      }
+    }
+
+    const hash = await hashPassword(newPassword);
+    await db.app_config.put({
+      id: 'password_hash',
+      value: hash,
+      sync_status: 'pending',
+      updated_at: new Date().toISOString()
+    });
+    setHasPassword(true);
+    setNewPassword('');
+    setCurrentPassword('');
+    setIsSettingPassword(false);
+    toast.success('App password set successfully');
+    
+    // Trigger sync to cloud
+    if (navigator.onLine) {
+      syncNow().catch(() => {});
+    }
+  };
+
+  const handleRemovePassword = async () => {
+    const pwd = window.prompt('Enter current password to remove lock:');
+    if (!pwd) return;
+    
+    const currentHash = await hashPassword(pwd);
+    const storedConfig = await db.app_config.get('password_hash');
+    
+    if (currentHash !== storedConfig?.value) {
+      toast.error('Incorrect password');
+      return;
+    }
+    
+    await db.app_config.put({
+      id: 'password_hash',
+      value: '', // clear password hash
+      is_deleted: true, // soft delete for sync
+      sync_status: 'pending',
+      updated_at: new Date().toISOString()
+    });
+    setHasPassword(false);
+    toast.success('App password removed');
+    
+    // Trigger sync to cloud
+    if (navigator.onLine) {
+      syncNow().catch(() => {});
+    }
+  };
+
   // ── Helpers ──────────────────────────────────────────────────────────────
   const statusBadge = (status) => {
     const map = {
@@ -261,6 +332,62 @@ export default function SystemHealth() {
           accent="blue"
           icon={HardDrive}
         />
+      </div>
+
+      {/* ── Security / App Lock ── */}
+      <div className="bg-white rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-text flex items-center gap-2 mb-4">
+          <Lock size={20} className="text-primary" /> App Security
+        </h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div>
+            <p className="font-medium text-text">App Lock Password</p>
+            <p className="text-sm text-muted">
+              {hasPassword 
+                ? 'Your app is currently protected by a password. It will be required on launch.' 
+                : 'Set a password to lock the app. Anyone opening the app will need it.'}
+            </p>
+          </div>
+          <div>
+            {isSettingPassword ? (
+              <div className="flex flex-col gap-2">
+                {hasPassword && (
+                  <input 
+                    type="password" 
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Current password"
+                    className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+                    autoFocus
+                  />
+                )}
+                <input 
+                  type="password" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="New password"
+                  className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+                  autoFocus={!hasPassword}
+                />
+                <div className="flex items-center gap-2 mt-1">
+                  <Button onClick={handleSetPassword} disabled={!newPassword || (hasPassword && !currentPassword)}>Save</Button>
+                  <Button variant="ghost" onClick={() => { setIsSettingPassword(false); setNewPassword(''); setCurrentPassword(''); }}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                {hasPassword ? (
+                  <>
+                    <Button onClick={() => setIsSettingPassword(true)}>Change Password</Button>
+                    <Button variant="danger" onClick={handleRemovePassword}>Remove</Button>
+                  </>
+                ) : (
+                  <Button onClick={() => setIsSettingPassword(true)}>Set Password</Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ── Sync Status Breakdown ── */}

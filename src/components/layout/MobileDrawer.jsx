@@ -26,7 +26,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
         <div className="p-4 flex items-center justify-between border-b border-white/10">
           <div className="flex items-center gap-3">
             <img src="./image/logo.png" alt="Logo" className="h-12 w-auto object-contain brightness-0 invert" />
-             <span className="font-semibold">Dawa Trust</span>
+             <span className="font-semibold">MAKHDOOMIYYA</span>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-md">
             <X size={20} />

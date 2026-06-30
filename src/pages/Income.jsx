@@ -7,8 +7,9 @@ import { validators } from '../utils/validators';
 import { newId } from '../utils/uuid';
 import { todayISO, formatINR, formatDate } from '../utils/formatters';
 import { amountToWords } from '../utils/amountToWords';
-import { exportTablePDF, exportReceiptAsPDF, exportReceiptAsPDFExperimental } from '../utils/exportPDF';
+import { exportTablePDF, exportReceiptAsPDF } from '../utils/exportPDF';
 import { exportToExcel } from '../utils/exportExcel';
+import { Edit2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Input from '../components/ui/Input';
@@ -279,22 +280,6 @@ export default function Income() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={async () => {
-              if (income.length === 0) return toast.error('No data to export');
-              setIsExporting(true);
-              toast.loading('Generating Excel...', { id: 'excel' });
-              exportToExcel(income, [
-                 { key: 'date', label: 'Date' },
-                 { key: 'digitalReceiptNo', label: 'Receipt No' },
-                 { key: 'category', label: 'Category' },
-                 { key: 'payerName', label: 'Payer Name' },
-                 { key: 'amount', label: 'Amount' }
-              ], `income-report-${todayISO()}.xlsx`);
-              toast.success('Downloaded!', { id: 'excel' });
-              setIsExporting(false);
-            }}>
-              Download Excel
-            </Button>
           </div>
         </div>
         

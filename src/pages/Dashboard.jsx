@@ -8,7 +8,8 @@ import { format, subMonths } from 'date-fns';
 import { TrendingUp, TrendingDown, Scale, RefreshCw, Heart, ShoppingBasket, Plus, Minus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import EmptyState from '../components/ui/EmptyState';
-import MonthPicker from '../components/ui/MonthPicker';
+import AdvancedDateFilter from '../components/ui/AdvancedDateFilter';
+import { startOfMonth, endOfMonth } from 'date-fns';
 
 export default function Dashboard() {
   const { 
@@ -22,32 +23,35 @@ export default function Dashboard() {
     fetchDateRangeFromServer
   } = useTransactions();
   
-  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
+  const [dateFilter, setDateFilter] = useState(() => {
+    const today = new Date();
+    return {
+      start: format(startOfMonth(today), 'yyyy-MM-dd'),
+      end: format(endOfMonth(today), 'yyyy-MM-dd'),
+      label: 'This Month'
+    };
+  });
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' | 'overall'
 
-  // Auto-fetch data for whichever month the user selects
+  // Auto-fetch data for whichever date range the user selects
   useEffect(() => {
-    if (!selectedMonth) return;
-    const [y, mo] = selectedMonth.split('-');
-    const monthStart = `${y}-${mo}-01`;
-    const monthEnd = new Date(parseInt(y), parseInt(mo), 0).toISOString().split('T')[0];
-    fetchDateRangeFromServer(monthStart, monthEnd);
-  }, [selectedMonth]); // fetchDateRangeFromServer is a stable closure
+    if (!dateFilter.start || !dateFilter.end) return;
+    fetchDateRangeFromServer(dateFilter.start, dateFilter.end);
+  }, [dateFilter.start, dateFilter.end]);
 
-  // Filter by selected month for the monthly view
+  // Filter by selected date range for the monthly view
   const filteredTransactions = useMemo(() => {
     return allTransactions.filter(t => {
       if (viewMode === 'overall') return true;
-      if (!selectedMonth) return true;
+      if (!dateFilter.start || !dateFilter.end) return true;
       try {
-        const [year, month] = selectedMonth.split('-');
-        const tDate = new Date(t.date);
-        return tDate.getFullYear() === parseInt(year) && (tDate.getMonth() + 1) === parseInt(month);
+        const tDate = t.date; // assuming ISO yyyy-MM-dd format
+        return tDate >= dateFilter.start && tDate <= dateFilter.end;
       } catch {
         return true;
       }
     });
-  }, [allTransactions, selectedMonth, viewMode]);
+  }, [allTransactions, dateFilter, viewMode]);
 
   const monthlyIncome = useMemo(() => 
     filteredTransactions
@@ -123,10 +127,10 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           {/* Desktop Month Picker */}
           <div className="hidden md:block">
-            <MonthPicker
-              value={selectedMonth}
+            <AdvancedDateFilter
+              value={dateFilter}
               onChange={(val) => {
-                setSelectedMonth(val);
+                setDateFilter(val);
                 setViewMode('monthly');
               }}
             />
@@ -149,17 +153,16 @@ export default function Dashboard() {
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-[12px] font-semibold text-[#94d3c1] uppercase tracking-wider opacity-80">
-                  {viewMode === 'monthly' ? format(new Date(selectedMonth + '-01'), 'MMM yyyy') : 'All Time'}
+                  {viewMode === 'monthly' ? dateFilter.label : 'All Time'}
                 </span>
                 <h2 className="text-sm font-medium text-[#afefdd] opacity-90 mt-1">Net Balance (Shishtam)</h2>
               </div>
               {/* Month Selector Dropdown */}
               {viewMode === 'monthly' && (
                 <div>
-                  <MonthPicker
-                    value={selectedMonth}
-                    onChange={(val) => setSelectedMonth(val)}
-                    dark={true}
+                  <AdvancedDateFilter
+                    value={dateFilter}
+                    onChange={(val) => setDateFilter(val)}
                   />
                 </div>
               )}

@@ -12,7 +12,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    title: 'Dawa Trust Dashboard',
+    title: 'MAKHDOOMIYYA Dashboard',
     icon: path.join(__dirname, 'public/icon.ico'), // Corrected path to .ico
     webPreferences: {
       nodeIntegration: false, // Security: Disable Node integration in renderer

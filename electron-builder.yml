@@ -1,5 +1,5 @@
 appId: com.dawatrust.desktop
-productName: Dawa Trust
+productName: MAKHDOOMIYYA
 directories:
   output: dist_electron
   buildResources: public
@@ -18,7 +18,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Dawa Trust
+  shortcutName: MAKHDOOMIYYA
   installerIcon: public/icon.ico
   uninstallerIcon: public/icon.ico
   deleteAppDataOnUninstall: false # Keep backups safe!

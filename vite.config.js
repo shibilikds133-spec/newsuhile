@@ -17,7 +17,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
-        name: 'Dawa Trust Dashboard',
+        name: 'MAKHDOOMIYYA Dashboard',
         short_name: 'DawaTrust',
         description: 'Office Management Dashboard',
         theme_color: '#ffffff',

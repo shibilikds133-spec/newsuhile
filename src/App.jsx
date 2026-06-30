@@ -88,11 +88,51 @@ function AppCore() {
   return <RouterProvider router={router} />;
 }
 
+import LockScreen from './components/auth/LockScreen';
+import db from './utils/db';
+
+function AuthWrapper({ children }) {
+  const [isLocked, setIsLocked] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    async function checkLock() {
+      try {
+        const storedHash = await db.app_config.get('password_hash');
+        if (!storedHash || !storedHash.value) {
+          setIsLocked(false);
+        }
+      } catch (err) {
+        console.error('Failed to read config', err);
+        setIsLocked(false);
+      } finally {
+        setIsInitializing(false);
+      }
+    }
+    checkLock();
+  }, []);
+
+  if (isInitializing) {
+    return <div className="min-h-screen bg-bg flex items-center justify-center">Loading...</div>;
+  }
+
+  if (isLocked) {
+    return (
+      <>
+        <LockScreen onUnlock={() => setIsLocked(false)} />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  return children;
+}
+
 export default function App() {
   return (
-    <>
+    <AuthWrapper>
       <AppCore />
       <Toaster position="top-right" />
-    </>
+    </AuthWrapper>
   );
 }

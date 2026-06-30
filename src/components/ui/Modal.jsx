@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Button from './Button';
 
 export default function Modal({ 
@@ -9,11 +10,19 @@ export default function Modal({
   onCancel, 
   confirmLabel = 'Confirm', 
   cancelLabel = 'Cancel',
-  confirmVariant = 'primary' 
+  confirmVariant = 'primary',
+  children
 }) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
@@ -27,17 +36,25 @@ export default function Modal({
           <h3 className="text-lg font-semibold text-text">{title}</h3>
         </div>
         <div className="px-6 py-4">
-          <p className="text-sm text-muted">{message}</p>
+          {message && <p className="text-sm text-muted mb-4">{message}</p>}
+          {children}
         </div>
-        <div className="px-6 py-4 bg-bg flex justify-end gap-3">
-          <Button variant="secondary" onClick={onCancel}>
-            {cancelLabel}
-          </Button>
-          <Button variant={confirmVariant} onClick={onConfirm}>
-            {confirmLabel}
-          </Button>
-        </div>
+        {(onConfirm || onCancel) && (
+          <div className="px-6 py-4 bg-bg flex justify-end gap-3">
+            {onCancel && (
+              <Button variant="secondary" onClick={onCancel}>
+                {cancelLabel}
+              </Button>
+            )}
+            {onConfirm && (
+              <Button variant={confirmVariant} onClick={onConfirm}>
+                {confirmLabel}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

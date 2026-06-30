@@ -28,4 +28,13 @@ db.version(3).stores({
   sync_log: '++id, record_id, table_name, status, attempted_at',
 });
 
+// Version 4 — Adds app_config table
+db.version(4).stores({
+  income: 'id, date, type, paymentStatus, synced, sync_status',
+  expenses: 'id, date, type, paymentStatus, synced, sync_status',
+  refreshments: 'id, date, type, paymentStatus, synced, sync_status',
+  sync_log: '++id, record_id, table_name, status, attempted_at',
+  app_config: 'id, sync_status, updated_at',
+});
+
 export default db;

@@ -3,14 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "description": "Office Management Dashboard",
-  "author": "Dawa Trust",
+  "author": "MAKHDOOMIYYA",
   "type": "module",
   "main": "main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:desktop": "vite build --config vite.config.desktop.js",
-    "pack": "npm run build:desktop && electron-packager . \"Dawa Trust Dashboard\" --platform=win32 --arch=x64 --out=dist_desktop --overwrite --icon=public/image/logo.png",
+    "pack": "npm run build:desktop && electron-packager . \"MAKHDOOMIYYA Dashboard\" --platform=win32 --arch=x64 --out=dist_desktop --overwrite --icon=public/image/logo.png",
     "dist:win": "npm run build:desktop && electron-builder build --win",
     "lint": "eslint .",
     "preview": "vite preview"

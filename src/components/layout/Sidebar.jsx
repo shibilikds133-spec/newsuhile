@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart, Lock } from 'lucide-react';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
@@ -36,7 +36,7 @@ export default function Sidebar() {
   return (
     <div className="sidebar w-60 h-screen bg-primary-dark fixed hidden md:flex flex-col text-white shadow-xl flex-shrink-0 z-40">
       <div className="p-6 flex flex-col items-center border-b border-white/10">
-        <div style={{ width: '200px', height: '200px' }} className="flex items-center justify-center mb-3 cursor-pointer" onClick={handleLogoClick}>
+        <div style={{ width: '200px', height: '200px' }} className="flex items-center justify-center cursor-pointer" onClick={handleLogoClick}>
           <img
             src="./image/logo.png"
             alt="Logo"
@@ -44,7 +44,6 @@ export default function Sidebar() {
             style={{ filter: 'brightness(0) invert(1)' }}
           />
         </div>
-        <h1 className="text-xl font-semibold tracking-tight text-center">Dawa Trust</h1>
       </div>
       
       <nav className="flex-1 py-6 px-3 flex flex-col gap-2">
@@ -66,8 +65,19 @@ export default function Sidebar() {
         ))}
       </nav>
       
-      <div className="p-4 text-center text-xs text-white/40 border-t border-white/10">
-        Dawa Trust &copy; {new Date().getFullYear()}
+      <div className="p-4 border-t border-white/10 flex flex-col gap-4">
+        {localStorage.getItem('app_password') && (
+          <button 
+            onClick={() => window.location.reload()}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors"
+          >
+            <Lock size={16} />
+            Lock App
+          </button>
+        )}
+        <div className="text-center text-xs text-white/40">
+          MAKHDOOMIYYA &copy; {new Date().getFullYear()}
+        </div>
       </div>
     </div>
   );

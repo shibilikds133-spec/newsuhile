@@ -14,7 +14,7 @@ export function useSync() {
     // -----------------------------------------------------------------------
     // Reconnect handler — fire immediately when coming back online
     // -----------------------------------------------------------------------
-    const handleOnline = async () => {
+    async function handleOnline() {
       setSyncStatus('syncing');
       try {
         // Retry previously failed records first, then push any pending ones.
@@ -28,7 +28,7 @@ export function useSync() {
         console.error('Auto-sync failed:', e);
         setSyncStatus('error');
       }
-    };
+    }
 
     // -----------------------------------------------------------------------
     // Interval sync — runs every 5 minutes while the app is open and online
@@ -75,7 +75,7 @@ export function useSync() {
   // -------------------------------------------------------------------------
   // syncNow — filters by sync_status:'pending' (more reliable than synced flag)
   // -------------------------------------------------------------------------
-  const syncNow = async () => {
+  async function syncNow() {
     setSyncStatus('syncing');
     try {
       await syncPendingRecords();
@@ -85,12 +85,12 @@ export function useSync() {
       setSyncStatus('error');
       throw e;
     }
-  };
+  }
 
   // -------------------------------------------------------------------------
   // retryFailed — resets all failed records back to pending and re-syncs
   // -------------------------------------------------------------------------
-  const retryFailed = async () => {
+  async function retryFailed() {
     setSyncStatus('syncing');
     try {
       await retryFailedRecords();
@@ -101,12 +101,12 @@ export function useSync() {
       setSyncStatus('error');
       toast.error('Retry failed. Check your connection.');
     }
-  };
+  }
 
   // -------------------------------------------------------------------------
   // pullFromCloud — full pull from Supabase → local IndexedDB
   // -------------------------------------------------------------------------
-  const pullFromCloud = async (fullHistory = false) => {
+  async function pullFromCloud(fullHistory = false) {
     try {
       if (!navigator.onLine) return;
 
@@ -134,15 +134,16 @@ export function useSync() {
         return allData;
       };
 
-      let incData, expData, refData;
+      let incData, expData, refData, configData;
       
       const lastCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
       const fetchCursor = fullHistory ? '1970-01-01T00:00:00.000Z' : lastCursor;
 
-      [incData, expData, refData] = await Promise.all([
+      [incData, expData, refData, configData] = await Promise.all([
         fetchAllRows('income', fetchCursor),
         fetchAllRows('expenses', fetchCursor),
         fetchAllRows('refreshments', fetchCursor),
+        fetchAllRows('app_config', fetchCursor),
       ]);
 
       const safeMerge = async (tableName, serverData, defaultStatus) => {
@@ -181,10 +182,11 @@ export function useSync() {
       await safeMerge('income', incData, 'Received');
       await safeMerge('expenses', expData, 'Paid');
       await safeMerge('refreshments', refData, 'Paid');
+      await safeMerge('app_config', configData, null);
 
       // Calculate max updated_at across all received rows
       let maxCursor = fetchCursor;
-      const allReceived = [...(incData || []), ...(expData || []), ...(refData || [])];
+      const allReceived = [...(incData || []), ...(expData || []), ...(refData || []), ...(configData || [])];
       for (const r of allReceived) {
         if (r.updated_at && new Date(r.updated_at) > new Date(maxCursor)) {
           maxCursor = r.updated_at;
@@ -209,7 +211,7 @@ export function useSync() {
       console.error('Failed to pull from cloud:', e);
       setSyncStatus('error');
     }
-  };
+  }
 
   return { syncNow, pullFromCloud, retryFailed };
 }
