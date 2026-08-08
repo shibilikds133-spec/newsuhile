@@ -55,7 +55,7 @@ export default function Income() {
       manualReceiptNo: '',
       amount: '',
       amountInWords: '',
-      paymentStatus: '',
+      paymentStatus: 'Received',
     },
     validate: validators.income,
     onSubmit: (values) => {
@@ -244,20 +244,6 @@ export default function Income() {
             <Input label="Contact No" name="contactNo" value={form.values.contactNo} onChange={form.handleChange} />
             
             <Input label="Amount (₹)" name="amount" type="number" min="1" required value={form.values.amount} onChange={handleAmountChange} error={form.errors.amount} />
-            <div className="flex flex-col gap-1">
-              <Select 
-                label="Payment Status" 
-                name="paymentStatus" 
-                required 
-                value={form.values.paymentStatus} 
-                onChange={form.handleChange}
-                error={form.errors.paymentStatus}
-              >
-                <option value="">Select Status...</option>
-                <option value="Received">Received</option>
-                <option value="Pending">Pending</option>
-              </Select>
-            </div>
             <div className="lg:col-span-1">
               <Input label="Amount in Words" name="amountInWords" value={form.values.amountInWords} onChange={form.handleChange} />
             </div>
