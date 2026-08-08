@@ -109,9 +109,18 @@ export default function AdvancedDateFilter({ value, onChange }) {
           >
             <ChevronLeft size={20} />
           </button>
-          <h3 className="font-bold text-lg text-text">
+          <button
+            onClick={() => {
+              onChange({
+                start: format(startOfMonth(viewMonth), 'yyyy-MM-dd'),
+                end: format(endOfMonth(viewMonth), 'yyyy-MM-dd'),
+                label: format(viewMonth, 'MMMM yyyy')
+              });
+            }}
+            className="font-bold text-lg text-text hover:text-primary cursor-pointer transition-colors px-2 py-0.5 rounded hover:bg-primary/10"
+          >
             {format(viewMonth, 'MMMM yyyy')}
-          </h3>
+          </button>
           <button 
             onClick={() => setViewMonth(addMonths(viewMonth, 1))}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
