@@ -116,6 +116,7 @@ export default function AdvancedDateFilter({ value, onChange }) {
                 end: format(endOfMonth(viewMonth), 'yyyy-MM-dd'),
                 label: format(viewMonth, 'MMMM yyyy')
               });
+              setIsOpen(false);
             }}
             className="font-bold text-lg text-text hover:text-primary cursor-pointer transition-colors px-2 py-0.5 rounded hover:bg-primary/10"
           >
