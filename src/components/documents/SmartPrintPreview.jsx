@@ -5,6 +5,7 @@ import { formatINR, formatDate, todayISO } from '../../utils/formatters';
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
 import PrintLayout from './PrintLayout';
+import { calculateTransactionSummary } from '../../utils/accounting';
 
 export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
   const printRef = useRef(null);
@@ -34,23 +35,12 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
 
   if (!isOpen || !data || !mounted) return null;
 
-  const totalIncome = data
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const totalExpense = data
-    .filter(t => t.type === 'expense' || t.type === 'refreshment')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const paidExpense = data
-    .filter(t => (t.type === 'expense' && t.paymentStatus === 'Paid') || t.type === 'refreshment')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const unpaidExpense = data
-    .filter(t => t.type === 'expense' && (t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending'))
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const netBalance = totalIncome - paidExpense;
+  const summary = calculateTransactionSummary(data);
+  const totalIncome = summary.receivedIncome;
+  const totalExpense = summary.totalPaidExpense;
+  const paidExpense = summary.totalPaidExpense;
+  const unpaidExpense = summary.pendingExpense + summary.pendingRefreshment;
+  const netBalance = summary.netBalance;
 
   const getShortName = (name) => {
     if (!name) return '-';

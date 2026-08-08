@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import EmptyState from '../components/ui/EmptyState';
 import AdvancedDateFilter from '../components/ui/AdvancedDateFilter';
 import { startOfMonth, endOfMonth } from 'date-fns';
+import { calculateTransactionSummary } from '../utils/accounting';
 
 export default function Dashboard() {
   const { 
@@ -53,25 +54,14 @@ export default function Dashboard() {
     });
   }, [allTransactions, dateFilter, viewMode]);
 
-  const monthlyIncome = useMemo(() => 
-    filteredTransactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+  const monthlySummary = useMemo(() => 
+    calculateTransactionSummary(filteredTransactions)
   , [filteredTransactions]);
 
-  const monthlyExpense = useMemo(() => 
-    filteredTransactions
-      .filter(t => (t.type === 'expense' && t.paymentStatus === 'Paid') || t.type === 'refreshment')
-      .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-  , [filteredTransactions]);
-
-  const monthlyUnpaid = useMemo(() => 
-    filteredTransactions
-      .filter(t => t.type === 'expense' && (t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending'))
-      .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-  , [filteredTransactions]);
-
-  const monthlyNetBalance = monthlyIncome - monthlyExpense;
+  const monthlyIncome = monthlySummary.receivedIncome;
+  const monthlyExpense = monthlySummary.totalPaidExpense;
+  const monthlyUnpaid = monthlySummary.pendingExpense + monthlySummary.pendingRefreshment;
+  const monthlyNetBalance = monthlySummary.netBalance;
 
   // Decide which data to show in cards
   const displayIncome = viewMode === 'monthly' ? monthlyIncome : overallIncome;

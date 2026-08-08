@@ -201,7 +201,21 @@ export default function Expense() {
               </datalist>
             </div>
             <Input label="Manual Voucher No" name="manualVoucherNo" value={form.values.manualVoucherNo} onChange={form.handleChange} />
-            <Input label="Paid To" name="paidTo" required value={form.values.paidTo} onChange={form.handleChange} error={form.errors.paidTo} />
+            <div className="flex flex-col gap-1">
+              <Input label="Paid To" name="paidTo" value={form.values.paidTo} onChange={form.handleChange} error={form.errors.paidTo} />
+              <div className="flex gap-1.5 flex-wrap">
+                {['Suhail Bukhari', 'Shiras Jouhari', 'Anas Naeemi'].map(name => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => form.setValues(prev => ({ ...prev, paidTo: name }))}
+                    className="px-2 py-0.5 text-[10px] font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full border border-gray-200 transition-colors"
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
             
             <div className="md:col-span-2 lg:col-span-3">
               <Input label="Being (Purpose)" name="being" required value={form.values.being} onChange={form.handleChange} error={form.errors.being} />

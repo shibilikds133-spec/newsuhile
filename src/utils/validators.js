@@ -1,5 +1,5 @@
 export const validators = {
-  income: ({ date, category, amount, payerName }) => {
+  income: ({ date, category, amount, payerName, paymentStatus }) => {
     const errors = {};
     if (!date) errors.date = 'Date is required';
     if (!category) errors.category = 'Category is required';
@@ -13,7 +13,6 @@ export const validators = {
     if (!date) errors.date = 'Date is required';
     if (!category) errors.category = 'Category is required';
     if (!amount || Number(amount) <= 0) errors.amount = 'Valid amount required';
-    if (!paidTo?.trim()) errors.paidTo = 'Paid to is required';
     if (!being?.trim()) errors.being = 'Purpose (Being) is required';
     if (!paymentStatus) errors.paymentStatus = 'Please select a payment status';
     return errors;

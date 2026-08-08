@@ -8,6 +8,7 @@ import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, REFRESHMENT_ITEMS } from '../con
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
 import db from '../utils/db';
+import { calculateTransactionSummary } from '../utils/accounting';
 
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
@@ -65,25 +66,10 @@ export default function Reports() {
     return true;
   });
 
-  const totalIncomeValue = filteredData
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  // Calculate total expense dynamically based on the payment filter
-  const totalExpenseValue = filteredData
-    .filter(t => {
-      if (t.type === 'refreshment') return true;
-      if (t.type === 'expense') {
-        // If user explicitly filtered for Pending, show Pending total
-        if (paymentFilter === 'Pending') return t.paymentStatus === 'Unpaid' || t.paymentStatus === 'Pending';
-        // Otherwise, only count Paid expenses towards cash spent
-        return t.paymentStatus === 'Paid';
-      }
-      return false;
-    })
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const netBalanceValue = totalIncomeValue - totalExpenseValue;
+  const filteredSummary = calculateTransactionSummary(filteredData);
+  const totalIncomeValue = filteredSummary.receivedIncome;
+  const totalExpenseValue = filteredSummary.totalPaidExpense;
+  const netBalanceValue = filteredSummary.netBalance;
 
   const columns = [
     { key: 'date', label: 'Date', render: r => formatDate(r.date) },

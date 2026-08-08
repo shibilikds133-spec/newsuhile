@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import db from '../utils/db';
 import { supabase } from '../utils/supabase';
 import toast from 'react-hot-toast';
+import { calculateTransactionSummary } from '../utils/accounting';
 
 // Shared sync status to prevent multiple calls across components
 let globalSyncStatus = 'synced';
@@ -346,27 +347,21 @@ export function useTransactions() {
   }, [income, expenses, refreshments]);
 
   const stats = useMemo(() => {
-    const totalInc = income.reduce((sum, r) => sum + Number(r.amount || 0), 0);
-    const totalExpOnly = expenses
-      .filter(r => r.paymentStatus === 'Paid')
-      .reduce((sum, r) => sum + Number(r.amount || 0), 0);
-    const totalExpAll = expenses.reduce((sum, r) => sum + Number(r.amount || 0), 0);
-    const totalUnp = expenses
-      .filter(r => r.paymentStatus === 'Unpaid' || r.paymentStatus === 'Pending')
-      .reduce((sum, r) => sum + Number(r.amount || 0), 0);
-    const totalRef = refreshments.reduce((sum, r) => sum + Number(r.amount || 0), 0);
-
-    const totalExp = totalExpOnly + totalRef;
-    const netBal = totalInc - totalExp;
+    const allTx = [...income, ...expenses, ...refreshments];
+    const summary = calculateTransactionSummary(allTx);
 
     return {
-      totalIncome: totalInc,
-      totalExpense: totalExp,
-      totalExpenseOnly: totalExpOnly,
-      totalExpenseAll: totalExpAll,
-      totalUnpaid: totalUnp,
-      totalRefreshment: totalRef,
-      netBalance: netBal,
+      totalIncome: summary.receivedIncome,
+      totalExpense: summary.totalPaidExpense,
+      totalExpenseOnly: summary.paidExpense,
+      totalExpenseAll: summary.paidExpense + summary.pendingExpense,
+      totalUnpaid: summary.pendingExpense,
+      totalRefreshment: summary.paidRefreshment,
+      netBalance: summary.netBalance,
+      pendingIncome: summary.pendingIncome,
+      pendingExpense: summary.pendingExpense,
+      pendingRefreshment: summary.pendingRefreshment,
+      totalPendingPayable: summary.totalPendingPayable,
     };
   }, [income, expenses, refreshments]);
 
