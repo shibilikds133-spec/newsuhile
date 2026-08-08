@@ -4,7 +4,6 @@ export const validators = {
     if (!date) errors.date = 'Date is required';
     if (!category) errors.category = 'Category is required';
     if (!amount || Number(amount) <= 0) errors.amount = 'Valid amount required';
-    if (!payerName?.trim()) errors.payerName = 'Payer name is required';
     if (!paymentStatus) errors.paymentStatus = 'Please select a payment status';
     return errors;
   },

@@ -239,7 +239,7 @@ export default function Income() {
             </div>
             <Input label="Manual Receipt No" name="manualReceiptNo" value={form.values.manualReceiptNo} onChange={form.handleChange} />
             
-            <Input label="Payer Name" name="payerName" required value={form.values.payerName} onChange={form.handleChange} error={form.errors.payerName} />
+            <Input label="Payer Name" name="payerName" value={form.values.payerName} onChange={form.handleChange} error={form.errors.payerName} />
             <Input label="Address" name="address" value={form.values.address} onChange={form.handleChange} />
             <Input label="Contact No" name="contactNo" value={form.values.contactNo} onChange={form.handleChange} />
             
