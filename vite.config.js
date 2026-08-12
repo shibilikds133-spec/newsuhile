@@ -2,10 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Workbox writes absolute module paths into the generated service worker.
+// An apostrophe in the project path breaks those generated JS imports because
+// Workbox quotes them with single quotes. Keep the normal PWA build everywhere
+// else, but disable generation for this unsafe local path so production builds
+// remain reproducible without touching application data.
+const disablePwaForUnsafePath = process.cwd().includes("'");
+
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      disable: disablePwaForUnsafePath,
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {

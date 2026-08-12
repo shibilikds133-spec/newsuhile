@@ -53,7 +53,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
       'TRAVELLING': 'TRAVL', 'RECHARGE & NET': 'RCHRG', 'OFF CAMPUS': 'OFF-C',
       'NEWS PAPER': 'N.PEPR', 'OTHER EXPENSE': 'OTH-E', 'MAINTENANCE': 'MAINT',
       'ELECTRICITY': 'ELEC', 'CHARITY': 'CHRT', 'KSEB': 'KSEB', 'WATER': 'WTR',
-      'SNACKS': 'SNCKS', 'MEALS': 'MLS', 'TEA': 'TEA', 'STE': 'STE',
+      'SNACKS': 'SNCKS', 'MEALS': 'MLS', 'TEA': 'TEA', 'STP': 'STP',
       'GENERAL': 'GENRL', 'SALARY': 'SAL', 'FOOD': 'FOOD',
     };
     return mapping[name.toUpperCase()] || name;

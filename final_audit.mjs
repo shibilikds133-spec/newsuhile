@@ -83,7 +83,7 @@ if (seqOk) passed.push("Sequences unique and valid"); else failed.push("Sequence
 
 // 6. Category Validation
 const INCOME_CATEGORIES = ['OPENING BALANCE', 'DONATION', 'ORGANIZER', 'ADMISSION', 'MONTHLY SWALATH INCOME', 'TIN COLLECTION', 'OTHER INCOME'];
-const EXPENSE_CATEGORIES = ['FOOD', 'SALARY', 'TRANSPORTATION', 'VEHICLE EXPENSE', 'STATIONARY', 'TRAVELLING', 'MONTHLY SWALATH EXPENSE', 'REPAIR', 'DTP & PRINT', 'CONSTRUCTION', 'KSEB', 'STE', 'CHARITY', 'RECHARGE & NET', 'OFF CAMPUS', 'GENERAL', 'WATER', 'NEWS PAPER', 'OTHER EXPENSE'];
+const EXPENSE_CATEGORIES = ['FOOD', 'SALARY', 'TRANSPORTATION', 'VEHICLE EXPENSE', 'STATIONARY', 'TRAVELLING', 'MONTHLY SWALATH EXPENSE', 'REPAIR', 'DTP & PRINT', 'CONSTRUCTION', 'KSEB', 'STP', 'CHARITY', 'RECHARGE & NET', 'OFF CAMPUS', 'GENERAL', 'WATER', 'NEWS PAPER', 'OTHER EXPENSE'];
 let catOk = true;
 for (const r of data.records) {
   if (r.type === 'income' && !INCOME_CATEGORIES.includes(r.category)) { catOk = false; failed.push(`Invalid cat ${r.category}`); }
