@@ -43,7 +43,7 @@ export default function Expense() {
       amount: '',
       amountInWords: '',
       paymentMode: 'Cash',
-      paymentStatus: 'Pending',
+      paymentStatus: 'Paid',
       approvedBy: '',
       remarks: '',
       manualVoucherNo: ''
