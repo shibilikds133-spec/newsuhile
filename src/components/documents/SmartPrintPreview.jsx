@@ -338,18 +338,20 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
             <h3 className="hidden sm:block text-base font-bold text-gray-800 tracking-tight">Report Preview</h3>
             
             {/* Toggle Detailed View */}
-            <label className="flex items-center gap-2.5 cursor-pointer select-none bg-gray-50 px-3 py-1.5 sm:py-2 rounded-md border border-gray-200 shadow-sm hover:border-gray-300 transition-colors ml-1 sm:ml-0">
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={showDetailed}
-                  onChange={(e) => setShowDetailed(e.target.checked)}
-                />
-                <div className="w-8 h-4.5 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:after:translate-x-full"></div>
-              </div>
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-widest mt-[1px]">Detailed</span>
-            </label>
+            <div className="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200 ml-2 sm:ml-0">
+              <button 
+                onClick={() => setShowDetailed(false)}
+                className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md transition-all ${!showDetailed ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Summary
+              </button>
+              <button 
+                onClick={() => setShowDetailed(true)}
+                className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md transition-all ${showDetailed ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Detailed
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 pr-2 sm:pr-0">
@@ -362,18 +364,37 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         </div>
 
         {/* Scrollable Preview Area */}
-        <div className="flex-1 overflow-auto bg-slate-100 p-0 sm:p-6 report-preview-scroll scrollbar-thin">
-          <div className="flex justify-center min-w-fit w-full pb-10 pt-4 sm:pt-0">
-            <div 
-              ref={printRef} 
-              className="print-content shadow-2xl bg-white shrink-0 mx-auto" 
-              style={{ 
-                width: '210mm', 
-                minWidth: '210mm', 
-                minHeight: '297mm',
-                zoom: 'min(1, calc(100vw / 820))'
-              }}
-            >
+        <div className="flex-1 overflow-auto bg-slate-100 p-2 sm:p-6 report-preview-scroll scrollbar-thin flex justify-center">
+          <style>{`
+            .pdf-scale-wrapper {
+              transform: scale(var(--pdf-scale, 1));
+              transform-origin: top center;
+              transition: transform 0.2s ease-out;
+            }
+            @media (max-width: 400px) {
+              :root { --pdf-scale: calc(100vw / 840); }
+            }
+            @media (min-width: 401px) and (max-width: 640px) {
+              :root { --pdf-scale: calc(100vw / 840); }
+            }
+            @media (min-width: 641px) and (max-width: 850px) {
+              :root { --pdf-scale: calc(100vw / 880); }
+            }
+            @media (min-width: 851px) {
+              :root { --pdf-scale: 1; }
+            }
+          `}</style>
+          
+          <div className="pb-10 pt-2 sm:pt-0 w-full max-w-full flex justify-center">
+            <div className="pdf-scale-wrapper">
+              <div 
+                ref={printRef} 
+                className="print-content shadow-2xl bg-white shrink-0 mx-auto" 
+                style={{ 
+                  width: '210mm', 
+                  minHeight: '297mm',
+                }}
+              >
             <PrintLayout 
               title={filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} (Category-wise summary)` : 'Financial Summary'} 
               dateRange={filters?.fromDate ? `${formatDate(filters.fromDate)} - ${formatDate(filters.toDate)}` : 'Full Period'}
@@ -454,10 +475,11 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                 </div>
               )}
             </PrintLayout>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>,
     document.body
   );
