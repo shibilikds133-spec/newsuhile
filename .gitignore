@@ -31,3 +31,7 @@ win-unpacked
 build_log*.txt
 
 .vercel
+
+# Environment files
+.env
+.env.*
