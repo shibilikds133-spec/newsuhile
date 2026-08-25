@@ -27,10 +27,10 @@ const navItems = [
 
 const routeTitles = {
   '/': 'Dashboard',
-  '/income': 'Income (Varav)',
-  '/expense': 'Expense (Chilav)',
+  '/income': 'Income',
+  '/expense': 'Expense',
   '/refreshment': 'Refreshment',
-  '/events': 'Events (ഇവന്റുകൾ)',
+  '/events': 'Events',
   '/reports': 'Reports',
   '/system-admin': 'System Admin',
   '/health': 'System Health',

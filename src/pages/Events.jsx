@@ -55,7 +55,7 @@ export default function Events() {
     <div className="space-y-6 pb-20 md:pb-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Events (ഇവന്റുകൾ)</h1>
+          <h1 className="text-2xl font-bold text-text">Events</h1>
           <p className="text-muted text-sm mt-1">Manage special event finances</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto">
@@ -122,7 +122,7 @@ export default function Events() {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Event">
         <form onSubmit={handleCreate} className="space-y-4 mt-4">
           <Input
-            label="Event Name (ഇവന്റിന്റെ പേര്)"
+            label="Event Name"
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="e.g. വാർഷികം 2026"
@@ -130,7 +130,7 @@ export default function Events() {
             autoFocus
           />
           <Input
-            label="Description (വിശദീകരണം)"
+            label="Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="Optional details..."
