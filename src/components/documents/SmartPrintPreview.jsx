@@ -141,7 +141,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
       doc.setTextColor(30, 41, 59); // slate-800
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      const title = filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} SUMMARY` : 'FINANCIAL STATEMENT';
+      const title = filters?.eventName ? `EVENT: ${filters.eventName.toUpperCase()}` : filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} SUMMARY` : 'FINANCIAL STATEMENT';
       doc.text(title, mL, y);
       y += 8;
 

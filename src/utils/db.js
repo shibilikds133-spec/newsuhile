@@ -37,4 +37,15 @@ db.version(4).stores({
   app_config: 'id, sync_status, updated_at',
 });
 
+// Version 5 — Custom Events (Isolated)
+db.version(5).stores({
+  income: 'id, date, type, paymentStatus, synced, sync_status',
+  expenses: 'id, date, type, paymentStatus, synced, sync_status',
+  refreshments: 'id, date, type, paymentStatus, synced, sync_status',
+  sync_log: '++id, record_id, table_name, status, attempted_at',
+  app_config: 'id, sync_status, updated_at',
+  events: 'id, name, status, created_at, sync_status',
+  event_transactions: 'id, event_id, date, type, category, sync_status',
+});
+
 export default db;

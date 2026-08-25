@@ -16,7 +16,7 @@
 import db from '../utils/db';
 import { supabase } from '../utils/supabase';
 
-const TABLES = ['income', 'expenses', 'refreshments', 'app_config'];
+const TABLES = ['income', 'expenses', 'refreshments', 'app_config', 'events', 'event_transactions'];
 
 // ---------------------------------------------------------------------------
 // Internal helpers

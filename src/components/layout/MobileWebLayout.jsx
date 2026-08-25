@@ -12,7 +12,8 @@ import {
   CloudOff,
   Plus,
   Minus,
-  Lock
+  Lock,
+  CalendarDays
 } from 'lucide-react';
 import { useTransactions } from '../../hooks/useTransactions';
 
@@ -20,7 +21,7 @@ const navItems = [
   { name: 'Home', path: '/', icon: LayoutDashboard },
   { name: 'Income', path: '/income', icon: TrendingUp },
   { name: 'Expense', path: '/expense', icon: TrendingDown },
-  { name: 'Refresh.', path: '/refreshment', icon: Coffee },
+  { name: 'Events', path: '/events', icon: CalendarDays },
   { name: 'Reports', path: '/reports', icon: FileBarChart },
 ];
 
@@ -29,6 +30,7 @@ const routeTitles = {
   '/income': 'Income (Varav)',
   '/expense': 'Expense (Chilav)',
   '/refreshment': 'Refreshment',
+  '/events': 'Events (ഇവന്റുകൾ)',
   '/reports': 'Reports',
   '/system-admin': 'System Admin',
   '/health': 'System Health',

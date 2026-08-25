@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart, Lock } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart, Lock, CalendarDays } from 'lucide-react';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Income (Varav)', path: '/income', icon: TrendingUp },
   { name: 'Expense (Chilav)', path: '/expense', icon: TrendingDown },
   { name: 'Refreshment (Chayachilav)', path: '/refreshment', icon: Coffee },
+  { name: 'Events (ഇവന്റുകൾ)', path: '/events', icon: CalendarDays },
   { name: 'Reports', path: '/reports', icon: FileBarChart },
 ];
 

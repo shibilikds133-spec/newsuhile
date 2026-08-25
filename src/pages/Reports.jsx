@@ -138,8 +138,8 @@ export default function Reports() {
       return toast.error('No records found for selected criteria');
     }
 
-    // Sort descending
-    dataToPrint.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Sort ascending (oldest first)
+    dataToPrint.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     setPrintPreviewFilters({ fromDate: printFrom, toDate: printTo, paymentStatus, categories });
     setPrintPreviewData(dataToPrint);
@@ -267,7 +267,7 @@ export default function Reports() {
                 return true;
               });
 
-              latestData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+              latestData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
               setPrintPreviewFilters({ 
                 fromDate, 

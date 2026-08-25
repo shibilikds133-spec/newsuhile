@@ -134,16 +134,18 @@ export function useSync() {
         return allData;
       };
 
-      let incData, expData, refData, configData;
+      let incData, expData, refData, configData, eventsData, eventTxData;
       
       const lastCursor = localStorage.getItem('dawa_last_sync_cursor') || '1970-01-01T00:00:00.000Z';
       const fetchCursor = fullHistory ? '1970-01-01T00:00:00.000Z' : lastCursor;
 
-      [incData, expData, refData, configData] = await Promise.all([
+      [incData, expData, refData, configData, eventsData, eventTxData] = await Promise.all([
         fetchAllRows('income', fetchCursor),
         fetchAllRows('expenses', fetchCursor),
         fetchAllRows('refreshments', fetchCursor),
         fetchAllRows('app_config', fetchCursor),
+        fetchAllRows('events', fetchCursor),
+        fetchAllRows('event_transactions', fetchCursor),
       ]);
 
       const safeMerge = async (tableName, serverData, defaultStatus) => {
@@ -183,10 +185,12 @@ export function useSync() {
       await safeMerge('expenses', expData, 'Paid');
       await safeMerge('refreshments', refData, 'Paid');
       await safeMerge('app_config', configData, null);
+      await safeMerge('events', eventsData, null);
+      await safeMerge('event_transactions', eventTxData, 'Paid');
 
       // Calculate max updated_at across all received rows
       let maxCursor = fetchCursor;
-      const allReceived = [...(incData || []), ...(expData || []), ...(refData || []), ...(configData || [])];
+      const allReceived = [...(incData || []), ...(expData || []), ...(refData || []), ...(configData || []), ...(eventsData || []), ...(eventTxData || [])];
       for (const r of allReceived) {
         if (r.updated_at && new Date(r.updated_at) > new Date(maxCursor)) {
           maxCursor = r.updated_at;
