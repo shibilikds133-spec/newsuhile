@@ -204,3 +204,75 @@ export function useEventDetail(eventId) {
     loading
   };
 }
+
+export function useEventCategories(eventId) {
+  const rawConfig = useLiveQuery(
+    () => db.app_config.filter(r => r.id.startsWith(`event_cat_${eventId}_`) && !r.is_deleted).toArray(),
+    [eventId]
+  ) || [];
+
+  const incomeCategories = useMemo(() => {
+    return rawConfig.filter(c => c.id.includes('_income_')).map(c => c.value);
+  }, [rawConfig]);
+
+  const expenseCategories = useMemo(() => {
+    return rawConfig.filter(c => c.id.includes('_expense_')).map(c => c.value);
+  }, [rawConfig]);
+
+  const saveCustomCategory = async (type, category) => {
+    if (!category || !category.trim()) return;
+    const catUpper = category.trim().toUpperCase();
+    if (type === 'income' && catUpper === 'DONATION') return;
+    if (type === 'expense' && catUpper === 'EXPENSE') return;
+    
+    const id = `event_cat_${eventId}_${type}_${catUpper}`;
+    const existing = await db.app_config.get(id);
+    if (!existing || existing.is_deleted) {
+      const record = {
+        id,
+        value: catUpper,
+        is_deleted: false,
+        sync_status: 'pending',
+        updated_at: new Date().toISOString()
+      };
+      await db.app_config.put(record);
+      
+      // Auto push to cloud if online
+      if (navigator.onLine) {
+        supabase.from('app_config').upsert([{
+          id: record.id,
+          value: record.value,
+          updated_at: record.updated_at,
+          is_deleted: record.is_deleted
+        }]).then(({ error }) => {
+          if (!error) db.app_config.update(id, { sync_status: 'synced' });
+        });
+      }
+    }
+  };
+
+  const deleteCustomCategory = async (type, category) => {
+    const catUpper = category.trim().toUpperCase();
+    const id = `event_cat_${eventId}_${type}_${catUpper}`;
+    const existing = await db.app_config.get(id);
+    if (existing) {
+      const record = {
+        ...existing,
+        is_deleted: true,
+        sync_status: 'pending',
+        updated_at: new Date().toISOString()
+      };
+      await db.app_config.put(record);
+      
+      if (navigator.onLine) {
+        supabase.from('app_config').update({ is_deleted: true, updated_at: record.updated_at }).eq('id', id)
+          .then(({ error }) => {
+            if (!error) db.app_config.update(id, { sync_status: 'synced' });
+          });
+      }
+    }
+  };
+
+  return { incomeCategories, expenseCategories, saveCustomCategory, deleteCustomCategory };
+}
+

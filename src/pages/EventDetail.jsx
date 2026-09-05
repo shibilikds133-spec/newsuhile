@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEvents, useEventDetail } from '../hooks/useEvents';
+import { useEvents, useEventDetail, useEventCategories } from '../hooks/useEvents';
 import { formatINR, formatDate, todayISO } from '../utils/formatters';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../constants/categories';
 import { newId } from '../utils/uuid';
 import toast from 'react-hot-toast';
 
@@ -18,15 +17,22 @@ import DropdownMenu from '../components/ui/DropdownMenu';
 import SmartPrintPreview from '../components/documents/SmartPrintPreview';
 import EmptyState from '../components/ui/EmptyState';
 
-import { ArrowLeft, TrendingUp, TrendingDown, Scale, Printer, MoreVertical, Trash2, CheckCircle, XCircle, CalendarDays } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Scale, Printer, MoreVertical, Trash2, CheckCircle, XCircle, CalendarDays, X } from 'lucide-react';
 
 export default function EventDetail() {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const { event, transactions, summary, loading } = useEventDetail(eventId);
   const { addEventIncome, addEventExpense, deleteEventTransaction, updateEventTxStatus, archiveEvent, unarchiveEvent, deleteEvent } = useEvents();
+  const { incomeCategories, expenseCategories, saveCustomCategory, deleteCustomCategory } = useEventCategories(eventId);
 
   const [activeModal, setActiveModal] = useState(null); // 'income' | 'expense' | null
+  
+  useEffect(() => {
+    if (activeModal === 'income') setCategory('DONATION');
+    else if (activeModal === 'expense') setCategory('EXPENSE');
+  }, [activeModal]);
+
   const [printData, setPrintData] = useState(null);
   
   const [date, setDate] = useState(todayISO());
@@ -73,6 +79,7 @@ export default function EventDetail() {
       }
 
       toast.success('Transaction added');
+      saveCustomCategory(activeModal, category);
       closeModal();
     } catch (err) {
       toast.error('Failed to add transaction');
@@ -253,13 +260,37 @@ export default function EventDetail() {
       <Modal isOpen={!!activeModal} onClose={closeModal} title={`Add Event ${activeModal === 'income' ? 'Income' : 'Expense'}`}>
         <form onSubmit={handleAddSubmit} className="space-y-4 mt-4">
           <DatePicker label="Date" value={date} onChange={setDate} required />
-          <Select
-            label="Category"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            options={['', ...(activeModal === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)]}
-            required
-          />
+            <div>
+              <Input
+                label="Category"
+                value={category}
+                onChange={e => setCategory(e.target.value.toUpperCase())}
+                placeholder="Type or select a category..."
+                required
+              />
+              <div className="flex flex-wrap gap-2 mt-2">
+                {(activeModal === 'income' ? ['DONATION', ...incomeCategories] : ['EXPENSE', ...expenseCategories]).map((cat) => (
+                  <div key={cat} className="flex items-center bg-gray-100 rounded-full px-3 py-1 border border-gray-200 shadow-sm">
+                    <button 
+                      type="button" 
+                      onClick={() => setCategory(cat)} 
+                      className="text-xs font-semibold text-slate-700 hover:text-blue-700 uppercase"
+                    >
+                      {cat}
+                    </button>
+                    {cat !== 'DONATION' && cat !== 'EXPENSE' && (
+                      <button 
+                        type="button" 
+                        onClick={() => deleteCustomCategory(activeModal, cat)}
+                        className="ml-2 text-gray-400 hover:text-red-500 rounded-full p-0.5 transition-colors"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           <Input
             label={activeModal === 'income' ? 'Received From' : 'Paid To'}
             value={person}
