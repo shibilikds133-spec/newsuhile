@@ -27,11 +27,6 @@ export default function EventDetail() {
   const { incomeCategories, expenseCategories, saveCustomCategory, deleteCustomCategory } = useEventCategories(eventId);
 
   const [activeModal, setActiveModal] = useState(null); // 'income' | 'expense' | null
-  
-  useEffect(() => {
-    if (activeModal === 'income') setCategory('DONATION');
-    else if (activeModal === 'expense') setCategory('EXPENSE');
-  }, [activeModal]);
 
   const [printData, setPrintData] = useState(null);
   
@@ -41,6 +36,11 @@ export default function EventDetail() {
   const [person, setPerson] = useState(''); // payerName or paidTo
   const [notes, setNotes] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('Paid');
+
+  useEffect(() => {
+    if (activeModal === 'income') setCategory('DONATION');
+    else if (activeModal === 'expense') setCategory('EXPENSE');
+  }, [activeModal]);
 
   if (loading) {
     return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
