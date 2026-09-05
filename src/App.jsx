@@ -47,6 +47,9 @@ function AdaptiveLayout() {
   );
 }
 
+import Events from './pages/Events';
+import EventDetail from './pages/EventDetail';
+
 const router = createHashRouter([
   {
     path: '/',
@@ -56,6 +59,8 @@ const router = createHashRouter([
       { path: 'income', element: <Income /> },
       { path: 'expense', element: <Expense /> },
       { path: 'refreshment', element: <Refreshment /> },
+      { path: 'events', element: <Events /> },
+      { path: 'events/:eventId', element: <EventDetail /> },
       { path: 'reports', element: <Reports /> },
       { path: 'system-admin', element: <SystemHealth /> },
       { path: 'health', element: <SystemHealth /> },

@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart, Lock } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, TrendingDown, Coffee, FileBarChart, Lock, CalendarDays } from 'lucide-react';
+import { useEvents } from '../../hooks/useEvents';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Income (Varav)', path: '/income', icon: TrendingUp },
-  { name: 'Expense (Chilav)', path: '/expense', icon: TrendingDown },
-  { name: 'Refreshment (Chayachilav)', path: '/refreshment', icon: Coffee },
+  { name: 'Income', path: '/income', icon: TrendingUp },
+  { name: 'Expense', path: '/expense', icon: TrendingDown },
+  { name: 'Refreshment', path: '/refreshment', icon: Coffee },
+  { name: 'Events', path: '/events', icon: CalendarDays },
   { name: 'Reports', path: '/reports', icon: FileBarChart },
 ];
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
+  const { events } = useEvents();
 
   const handleLogoClick = () => {
     setClickCount((prev) => {
@@ -33,6 +36,8 @@ export default function Sidebar() {
     }
   }, [clickCount]);
 
+  const recentEvents = events ? events.slice(0, 3) : [];
+
   return (
     <div className="sidebar w-60 h-screen bg-primary-dark fixed hidden md:flex flex-col text-white shadow-xl flex-shrink-0 z-40">
       <div className="p-6 flex flex-col items-center border-b border-white/10">
@@ -46,22 +51,45 @@ export default function Sidebar() {
         </div>
       </div>
       
-      <nav className="flex-1 py-6 px-3 flex flex-col gap-2">
+      <nav className="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto">
         {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${
-                isActive
-                  ? 'bg-primary-mid text-white'
-                  : 'text-white/80 hover:bg-white/5 hover:text-white'
-              }`
-            }
-          >
-            <item.icon size={20} strokeWidth={2.5} />
-            {item.name}
-          </NavLink>
+          <React.Fragment key={item.path}>
+            <NavLink
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${
+                  isActive
+                    ? 'bg-primary-mid text-white'
+                    : 'text-white/80 hover:bg-white/5 hover:text-white'
+                }`
+              }
+            >
+              <item.icon size={20} strokeWidth={2.5} />
+              {item.name}
+            </NavLink>
+            
+            {/* Render nested events under Events tab */}
+            {item.name === 'Events' && recentEvents.length > 0 && (
+              <div className="ml-9 flex flex-col border-l border-white/20 pl-2 mt-1 mb-2 gap-1">
+                {recentEvents.map(ev => (
+                  <NavLink
+                    key={ev.id}
+                    to={`/events/${ev.id}`}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 px-3 py-2 rounded-md text-[13px] transition-colors ${
+                        isActive
+                          ? 'text-white bg-white/10 font-semibold'
+                          : 'text-white/60 hover:text-white hover:bg-white/5'
+                      }`
+                    }
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
+                    <span className="truncate flex-1">{ev.name}</span>
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </nav>
       

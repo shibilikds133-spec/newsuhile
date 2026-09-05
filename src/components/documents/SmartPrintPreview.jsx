@@ -141,7 +141,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
       doc.setTextColor(30, 41, 59); // slate-800
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      const title = filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} SUMMARY` : 'FINANCIAL STATEMENT';
+      const title = filters?.eventName ? `EVENT: ${filters.eventName.toUpperCase()}` : filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} SUMMARY` : 'FINANCIAL STATEMENT';
       doc.text(title, mL, y);
       y += 8;
 
@@ -165,7 +165,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         ];
         
         doc.setFillColor(248, 250, 252);
-        doc.rect(mL, y, contentW, 7, 'F');
+        doc.rect(mL, y, contentW, 10, 'F');
         doc.setDrawColor(226, 232, 240);
         doc.rect(mL, y, contentW, 7, 'S');
         doc.setTextColor(71, 85, 105);
@@ -173,13 +173,13 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         let curX = mL;
         cols.forEach(col => {
           if (col.align === 'right') {
-            doc.text(col.label, curX + col.w - 3, y + 4.5, { align: 'right' });
+            doc.text(col.label, curX + col.w - 3, y + 6.5, { align: 'right' });
           } else {
-            doc.text(col.label, curX + 3, y + 4.5);
+            doc.text(col.label, curX + 3, y + 6.5);
           }
           curX += col.w;
         });
-        y += 7;
+        y += 10;
 
         // Rows (Summary)
         doc.setTextColor(30, 41, 59);
@@ -187,29 +187,29 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         doc.setFontSize(8);
         
         summaryData.forEach((row) => {
-          checkY(7);
+          checkY(10);
           doc.setDrawColor(241, 245, 249);
-          doc.line(mL, y + 7, mL + contentW, y + 7);
+          doc.line(mL, y + 10, mL + contentW, y + 10);
           
           let cx = mL;
           doc.setTextColor(30, 41, 59);
-          doc.text(row.category.toUpperCase(), cx + 3, y + 4.5);
+          doc.text(row.category.toUpperCase(), cx + 3, y + 6.5);
           cx += cols[0].w;
           
           doc.setTextColor(22, 163, 74); // Green
-          doc.text(pdfINR(row.in), cx + cols[1].w - 3, y + 4.5, { align: 'right' });
+          doc.text(pdfINR(row.in), cx + cols[1].w - 3, y + 6.5, { align: 'right' });
           cx += cols[1].w;
           
           doc.setTextColor(220, 38, 38); // Red
-          doc.text(pdfINR(row.out), cx + cols[2].w - 3, y + 4.5, { align: 'right' });
+          doc.text(pdfINR(row.out), cx + cols[2].w - 3, y + 6.5, { align: 'right' });
           cx += cols[2].w;
           
           doc.setTextColor(30, 41, 59);
           doc.setFont('helvetica', 'bold');
-          doc.text(pdfINR(row.balance), cx + cols[3].w - 3, y + 4.5, { align: 'right' });
+          doc.text(pdfINR(row.balance), cx + cols[3].w - 3, y + 6.5, { align: 'right' });
           doc.setFont('helvetica', 'normal');
           
-          y += 7;
+          y += 10;
         });
 
         // Totals (Summary)
@@ -248,27 +248,27 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         ];
 
         doc.setFillColor(71, 85, 105); // slate-600
-        doc.rect(mL, y, contentW, 7, 'F');
+        doc.rect(mL, y, contentW, 10, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(7);
         let dx = mL;
         detailCols.forEach(col => {
-          if (col.align === 'right') doc.text(col.label, dx + col.w - 2, y + 5, { align: 'right' });
-          else doc.text(col.label, dx + 2, y + 5);
+          if (col.align === 'right') doc.text(col.label, dx + col.w - 2, y + 7, { align: 'right' });
+          else doc.text(col.label, dx + 2, y + 7);
           dx += col.w;
         });
-        y += 7;
+        y += 10;
 
         doc.setFont('helvetica', 'normal');
         data.forEach((t, idx) => {
-          checkY(6);
+          checkY(9);
           if (idx % 2 === 0) {
             doc.setFillColor(249, 250, 251);
-            doc.rect(mL, y, contentW, 6, 'F');
+            doc.rect(mL, y, contentW, 9, 'F');
           }
           doc.setTextColor(30, 41, 59);
           let cx = mL;
-          doc.text(formatDate(t.date), cx + 2, y + 4.5);
+          doc.text(formatDate(t.date), cx + 2, y + 6.5);
           cx += detailCols[0].w;
           
           doc.setFont('helvetica', 'bold');
@@ -277,22 +277,22 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
           } else {
             doc.setTextColor(220, 38, 38);
           }
-          doc.text(t.type.toUpperCase(), cx + 2, y + 4.5);
+          doc.text(t.type.toUpperCase(), cx + 2, y + 6.5);
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(30, 41, 59);
           cx += detailCols[1].w;
 
           // Safely truncate category to fit within 43mm width
-          doc.text((t.category || t.item || '').substring(0, 24), cx + 2, y + 4.5);
+          doc.text((t.category || t.item || '').substring(0, 24), cx + 2, y + 6.5);
           cx += detailCols[2].w;
 
           // Safely truncate description to fit within 69mm width
-          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 42), cx + 2, y + 4.5);
+          doc.text((t.payerName || t.paidTo || t.notes || '-').substring(0, 42), cx + 2, y + 6.5);
           cx += detailCols[3].w;
 
           doc.setFont('helvetica', 'bold');
-          doc.text(pdfINR(t.amount), pW - mR - 2, y + 4.5, { align: 'right' });
-          y += 6;
+          doc.text(pdfINR(t.amount), pW - mR - 2, y + 6.5, { align: 'right' });
+          y += 9;
         });
       }
 
@@ -304,7 +304,7 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
       doc.line(pW - mR - 40, y, pW - mR, y);
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
-      doc.text('SEAL & SIGNATURE', pW - mR - 20, y + 5, { align: 'center' });
+      doc.text('SEAL & SIGNATURE', pW - mR - 20, y + 7, { align: 'center' });
 
       addPageFooter();
 
@@ -338,18 +338,20 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
             <h3 className="hidden sm:block text-base font-bold text-gray-800 tracking-tight">Report Preview</h3>
             
             {/* Toggle Detailed View */}
-            <label className="flex items-center gap-2.5 cursor-pointer select-none bg-gray-50 px-3 py-1.5 sm:py-2 rounded-md border border-gray-200 shadow-sm hover:border-gray-300 transition-colors ml-1 sm:ml-0">
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={showDetailed}
-                  onChange={(e) => setShowDetailed(e.target.checked)}
-                />
-                <div className="w-8 h-4.5 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:after:translate-x-full"></div>
-              </div>
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-widest mt-[1px]">Detailed</span>
-            </label>
+            <div className="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200 ml-2 sm:ml-0">
+              <button 
+                onClick={() => setShowDetailed(false)}
+                className={`px-3 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md transition-all ${!showDetailed ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Summary
+              </button>
+              <button 
+                onClick={() => setShowDetailed(true)}
+                className={`px-3 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md transition-all ${showDetailed ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Detailed
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 pr-2 sm:pr-0">
@@ -362,18 +364,37 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
         </div>
 
         {/* Scrollable Preview Area */}
-        <div className="flex-1 overflow-auto bg-slate-100 p-0 sm:p-6 report-preview-scroll scrollbar-thin">
-          <div className="flex justify-center min-w-fit w-full pb-10 pt-4 sm:pt-0">
-            <div 
-              ref={printRef} 
-              className="print-content shadow-2xl bg-white shrink-0 mx-auto" 
-              style={{ 
-                width: '210mm', 
-                minWidth: '210mm', 
-                minHeight: '297mm',
-                zoom: 'min(1, calc(100vw / 820))'
-              }}
-            >
+        <div className="flex-1 overflow-auto bg-slate-100 p-2 sm:p-6 report-preview-scroll scrollbar-thin flex justify-center">
+          <style>{`
+            .pdf-scale-wrapper {
+              transform: scale(var(--pdf-scale, 1));
+              transform-origin: top center;
+              transition: transform 0.2s ease-out;
+            }
+            @media (max-width: 400px) {
+              :root { --pdf-scale: calc(100vw / 840); }
+            }
+            @media (min-width: 401px) and (max-width: 640px) {
+              :root { --pdf-scale: calc(100vw / 840); }
+            }
+            @media (min-width: 641px) and (max-width: 850px) {
+              :root { --pdf-scale: calc(100vw / 880); }
+            }
+            @media (min-width: 851px) {
+              :root { --pdf-scale: 1; }
+            }
+          `}</style>
+          
+          <div className="pb-10 pt-2 sm:pt-0 w-full max-w-full flex justify-center">
+            <div className="pdf-scale-wrapper">
+              <div 
+                ref={printRef} 
+                className="print-content shadow-2xl bg-white shrink-0 mx-auto" 
+                style={{ 
+                  width: '210mm', 
+                  minHeight: '297mm',
+                }}
+              >
             <PrintLayout 
               title={filters?.fromDate ? `${new Date(filters.fromDate).toLocaleString('default', { month: 'long' }).toUpperCase()} ${new Date(filters.fromDate).getFullYear()} (Category-wise summary)` : 'Financial Summary'} 
               dateRange={filters?.fromDate ? `${formatDate(filters.fromDate)} - ${formatDate(filters.toDate)}` : 'Full Period'}
@@ -394,14 +415,14 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                     <tbody>
                       {summaryData.map((row, idx) => (
                         <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
-                          <td className="px-4 py-1.5 font-bold text-slate-700 text-[11px] uppercase tracking-tight">{row.category}</td>
-                          <td className="px-4 py-1.5 text-right font-bold text-green-600 font-mono">
+                          <td className="px-4 py-3 font-bold text-slate-700 text-[11px] uppercase tracking-tight">{row.category}</td>
+                          <td className="px-4 py-3 text-right font-bold text-green-600 font-mono">
                             {row.in > 0 ? formatINR(row.in).replace('₹', '').trim() : '0'}
                           </td>
-                          <td className="px-4 py-1.5 text-right font-bold text-red-600 font-mono">
+                          <td className="px-4 py-3 text-right font-bold text-red-600 font-mono">
                             {row.out > 0 ? formatINR(row.out).replace('₹', '').trim() : '0'}
                           </td>
-                          <td className="px-4 py-1.5 text-right font-black text-slate-900 font-mono">
+                          <td className="px-4 py-3 text-right font-black text-slate-900 font-mono">
                             {formatINR(row.balance).replace('₹', '').trim()}
                           </td>
                         </tr>
@@ -409,10 +430,10 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                     </tbody>
                     <tfoot>
                       <tr className="bg-slate-50 font-black border-t-2 border-slate-200">
-                        <td className="px-4 py-2.5 text-slate-800 text-[11px] uppercase tracking-tighter">TOTAL SUMMARY</td>
-                        <td className="px-4 py-2.5 text-right text-green-700 font-mono">{formatINR(totalIncome).replace('₹', '').trim()}</td>
-                        <td className="px-4 py-2.5 text-right text-red-700 font-mono">{formatINR(totalExpense).replace('₹', '').trim()}</td>
-                        <td className="px-4 py-2.5 text-right text-blue-900 text-base font-mono">{formatINR(totalIncome - totalExpense).replace('₹', '').trim()}</td>
+                        <td className="px-4 py-4 text-slate-800 text-[11px] uppercase tracking-tighter">TOTAL SUMMARY</td>
+                        <td className="px-4 py-4 text-right text-green-700 font-mono">{formatINR(totalIncome).replace('₹', '').trim()}</td>
+                        <td className="px-4 py-4 text-right text-red-700 font-mono">{formatINR(totalExpense).replace('₹', '').trim()}</td>
+                        <td className="px-4 py-4 text-right text-blue-900 text-base font-mono">{formatINR(totalIncome - totalExpense).replace('₹', '').trim()}</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -429,21 +450,21 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                     <table className="w-full text-[10px] border-collapse bg-white table-fixed">
                       <thead>
                         <tr className="bg-slate-800 text-white font-bold uppercase tracking-wider">
-                          <th className="text-left px-3 py-1.5" style={{ width: '90px' }}>Date</th>
-                          <th className="text-left px-3 py-1.5" style={{ width: '110px' }}>Type</th>
-                          <th className="text-left px-3 py-1.5" style={{ width: '200px' }}>Category</th>
-                          <th className="text-left px-3 py-1.5" style={{ width: '320px' }}>Description</th>
-                          <th className="text-right px-3 py-1.5" style={{ width: '120px' }}>Amount</th>
+                          <th className="text-left px-3 py-3" style={{ width: '90px' }}>Date</th>
+                          <th className="text-left px-3 py-3" style={{ width: '110px' }}>Type</th>
+                          <th className="text-left px-3 py-3" style={{ width: '200px' }}>Category</th>
+                          <th className="text-left px-3 py-3" style={{ width: '320px' }}>Description</th>
+                          <th className="text-right px-3 py-3" style={{ width: '120px' }}>Amount</th>
                         </tr>
                       </thead>
                       <tbody>
                         {data.map((t, idx) => (
                           <tr key={idx} className="border-b border-slate-100 last:border-0">
-                            <td className="px-3 py-1 text-slate-500 font-medium whitespace-nowrap overflow-hidden">{formatDate(t.date)}</td>
-                            <td className={`px-3 py-1 font-bold uppercase text-[9px] whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>{t.type}</td>
-                            <td className="px-3 py-1 font-bold text-slate-700 truncate">{t.category || t.item}</td>
-                            <td className="px-3 py-1 text-slate-600 italic truncate">{(t.payerName || t.paidTo || t.notes || '-').substring(0, 60)}</td>
-                            <td className={`px-3 py-1 text-right font-bold whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
+                            <td className="px-3 py-3 text-slate-500 font-medium whitespace-nowrap overflow-hidden">{formatDate(t.date)}</td>
+                            <td className={`px-3 py-3 font-bold uppercase text-[9px] whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>{t.type}</td>
+                            <td className="px-3 py-3 font-bold text-slate-700 truncate">{t.category || t.item}</td>
+                            <td className="px-3 py-3 text-slate-600 italic truncate">{(t.payerName || t.paidTo || t.notes || '-').substring(0, 60)}</td>
+                            <td className={`px-3 py-3 text-right font-bold whitespace-nowrap overflow-hidden ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
                               {formatINR(t.amount).replace('₹', '').trim()}
                             </td>
                           </tr>
@@ -454,10 +475,11 @@ export default function SmartPrintPreview({ isOpen, onClose, data, filters }) {
                 </div>
               )}
             </PrintLayout>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>,
     document.body
   );
